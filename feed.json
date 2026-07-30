@@ -1,35 +1,165 @@
 [
-{"cat":"AI","items":[
-{"t":"Kimi K3 全量开源：2.8万亿参数成全球最大开源模型","s":"月之暗面 7月27日宣布旗舰模型 Kimi K3 全量开源，含权重与技术报告，开发者可免费下载本地部署","link":"https://big5.cctv.com/gate/big5/news.cctv.cn/2026/07/30/ARTIaK95LGLEtJTPZN2zCBqO260730.shtml","tag":"开源大模型"},
-{"t":"四大实验室 7 月集体发新模型，差距明显收窄","s":"xAI Grok 4.5、Anthropic Claude Opus 5、OpenAI GPT-5.6、Moonshot Kimi K3 三周内相继发布，最强与最弱能力差缩小","link":"https://gfdaily.com/tech/en-four-ai-labs-release-new-models-in-july-performance-gap-narrows-ms2igeaa","tag":"模型竞赛"},
-{"t":"7月 LLM 发布全景：Kimi K3 开源登顶、Gemini 3.6 Flash 降价","s":"Kimi K3 以 2.8T 参数成为首个 3T 级开源权重；Gemini 3.6 Flash 输出降价且知识截止跳到 2026年3月","link":"https://presenc.ai/research/july-2026-llm-release-roundup","tag":"行业动态"},
-{"t":"DeepSeek V4 完成 API 迭代，V4Flash 成新默认","s":"旧版 API 别名退役，V4Flash 全面接替，标志 DeepSeek 进入产品矩阵稳定化阶段","link":"https://weibo.com/2677194735/5325307063829299","tag":"国产模型"},
-{"t":"OpenAI 推企业软件 Presence，进军自动化办公","s":"定位客户支持与销售流程自动化，标志 OpenAI 从消费级向企业级应用拓展","link":"https://weibo.com/2677194735/5325307063829299","tag":"AI 应用"}
-]},
-{"cat":"产品经理","items":[
-{"t":"Vibe Coding：不会写代码成伪命题，PM 最该学","s":"用自然语言指挥 AI 开发功能，七种角色压缩成你与 AI 的对话，PM 是最大受益者","link":"https://www.toutiao.com/article/7663856351969296902/","tag":"Vibe Coding"},
-{"t":"产品经理 Vibe Coding 实战：AI Agent 打通原型到代码","s":"MCP 协议让编码工具直接读原型数据，PM 从画图人变成 AI Agent 指挥官","link":"https://adg.csdn.net/6a583530662f9a54cb8fd611.html","tag":"AI Agent"},
-{"t":"2026 年 12 款 Vibe Coding 工具横评","s":"Cursor/Windsurf/Claude Code/Devin/Cline 与 Lovable/Bolt/Replit/v0 等，分开发者与非技术创始人两类","link":"https://webfixtool.com/blog/best-vibe-coding-tools","tag":"工具链"},
-{"t":"AI 原生 IDE 与编码 Agent：开发者 vs 非技术创始人怎么选","s":"同一类工具覆盖三类产品，选错比选贵更糟，按你在建什么来挑","link":"https://webfixtool.com/blog/best-vibe-coding-tools","tag":"工具趋势"}
-]},
-{"cat":"电商","items":[
-{"t":"SHEIN 第三方平台占比 14.3%，全球时尚格局生变","s":"净利下滑至 20.64 亿美元；与此同时 YouTube 英国推购物联盟、Facebook 推卖家 App","link":"https://www.ebrun.com/20260728/690661.shtml","tag":"跨境平台"},
-{"t":"跨境电商 2026 拐点：Shopify 商家 31% GMV 来自跨境","s":"中小企业跨境占比达 38%，由西欧、海湾、东南亚拉动，基础设施借口已消失","link":"https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2","tag":"跨境趋势"},
-{"t":"希音计划 8 月港 IPO 融资 30 亿美元；亚马逊旺季配送费 10 月生效","s":"中国出海要从拼价格转向拼价值、拼全球化","link":"https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991","tag":"资本动态"},
-{"t":"Amazon 标题砍到 75 字符；TikTok Shop 测试订阅","s":"TikTok Shop 8 类目上线订阅、测试 Shop Plus 会员；中国关税上限 20%","link":"https://www.directtoconsumer.co/newsletter/amazon-product-title-update-meta-campaign-structure-tiktok-subscriptions","tag":"平台规则"},
-{"t":"TikTok 多国社交购物渗透率超 FB/IG","s":"马来西亚 95%、泰国 93%、沙特 77%、英国 72%，短视频+即时购物是核心动因","link":"https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991","tag":"社交电商"}
-]},
-{"cat":"海外独立站","items":[
-{"t":"Shopify 将 Shop Campaigns 扩至澳大利亚：成交后才收费","s":"商家自设获客成本，仅在实际购买后扣费，降低中小卖家获客门槛","link":"https://www.amz123.com/kx/bl5BXx9Q","tag":"Shopify 广告"},
-{"t":"SHOPLINE 与 Shopify 两年版权诉讼和解，中小商家免整改","s":"Shopify 撤销全部诉讼，使用涉诉模板商家无需换主题，店铺零影响","link":"https://so.html5.qq.com/page/real/search_news?docid=70000021_4626a6380f882152","tag":"行业合规"},
-{"t":"跨境电商进入整合期：本地支付成关键","s":"用 3 种以上本地支付方式的商家弃单率低 31%；加拿大/海湾/东南亚三线增长","link":"https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026","tag":"本地化"},
-{"t":"AI 本地化让中小卖家转化率提升 19%","s":"文化适配叙事 vs 机器翻译，差异在日韩等文化距离大的市场最明显","link":"https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026","tag":"AI 本地化"},
-{"t":"欧盟 ICS2 第三阶段强制，HS 编码库成护城河","s":"早做合规的商家欧洲订单利润率显著高于仍用 workaround 的对手","link":"https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2","tag":"合规"}
-]},
-{"cat":"产品sense","items":[
-{"t":"Amazon PM Product Sense 六步框架","s":"clarify→segment→metric→options→tradeoff→pressure test，让答案有结构又不显浅","link":"https://sirjohnnymai.com/zh/blog/amazon-pm-product-sense-the-framework-that-gets-you-hired","tag":"面试框架"},
-{"t":"如何培养 Product Sense（哪怕你不是 PM）","s":"30 天计划：第1周留意、第2周拆解、第3周见真实用户、第4周开口练，核心是做 reps","link":"https://hellopm.co/how-to-develop-product-sense","tag":"能力培养"},
-{"t":"Product Sense 2026 指南：沉浸用户、研究产品、练习拆解","s":"从 Jobs-to-be-Done 到框架内化，产品感是可刻意练习的判断力","link":"https://www.parallelhq.com/blog/what-product-sense","tag":"能力培养"},
-{"t":"Product Sense 面试指南：CIRCLES 框架 + 40+ 练习题","s":"Comprehend→Identify→Report→Cut→List→Evaluate→Summarize，占大厂 PM 面试 30-40%","link":"https://bestpmjobs.com/resources/product-sense-interview","tag":"面试框架"}
-]}
+ {
+  "cat": "AI",
+  "items": [
+   {
+    "t": "Kimi K3 全量开源：2.8万亿参数成全球最大开源模型",
+    "s": "月之暗面于7月27日正式宣布旗舰模型 Kimi K3 全量开源，开放完整模型权重与技术报告，开发者可免费下载并在本地部署。K3 参数量达 2.8 万亿，是当前全球规模最大的开源大模型，直接对标 Llama、Qwen 等开源阵营的顶尖选手。此次开源意味着中小团队和个人开发者第一次能以零成本拿到接近闭源旗舰的能力，对国内大模型生态是标志性事件。对企业而言，本地部署可规避数据出境与持续调用成本；对研究者而言，开放权重让模型蒸馏、微调、可解释性研究成为可能。值得关注的是，Kimi 选择『全量』而非『蒸馏版』开源，诚意更足，也可能倒逼其他厂商跟进开放。对产品经理来说，这是一个把强模型能力低成本嵌进自己产品的窗口期，尤其适合做私有化知识库、内部 Copilot 类工具。",
+    "link": "https://big5.cctv.com/gate/big5/news.cctv.cn/2026/07/30/ARTIaK95LGLEtJTPZN2zCBqO260730.shtml",
+    "tag": "开源大模型"
+   },
+   {
+    "t": "四大实验室 7 月集体发新模型，差距明显收窄",
+    "s": "xAI 的 Grok 4.5、Anthropic 的 Claude Opus 5、OpenAI 的 GPT-5.6 与 Moonshot 的 Kimi K3 在三周内相继发布，创下史上最密集的旗舰模型发布节奏。更关键的变化是：最强模型与最弱模型之间的能力差正在缩小，过去一年里『代际领先』的叙事被打破。对应用层创业者来说，这是个好消息——模型能力不再是一家独大，切换成本下降，议价权回到开发者手里。但也意味着『模型即护城河』的逻辑失效，真正差异化要落在产品体验、数据与场景上。PM 需要重新评估技术选型：不必押注单一供应商，可用路由策略按任务分配不同模型，用成本换效果。7 月这波发布也把长上下文、多模态与 Agent 工具调用推成了标配，下一阶段竞争焦点转向『能否稳定跑通真实工作流』。",
+    "link": "https://gfdaily.com/tech/en-four-ai-labs-release-new-models-in-july-performance-gap-narrows-ms2igeaa",
+    "tag": "模型竞赛"
+   },
+   {
+    "t": "7月 LLM 发布全景：Kimi K3 开源登顶、Gemini 3.6 Flash 降价",
+    "s": "7月大模型发布全景呈现出两条主线。其一是开源侧被 Kimi K3 以 2.8T 参数刷屏，首个 3T 级开源权重让社区沸腾；其二是商业侧 Google 把 Gemini 3.6 Flash 输出价格大幅下调，并把它知识截止时间跳到 2026 年 3 月，明显在抢价格敏感型与实时性要求高的开发者和企业客户。一升一降之间，模型市场的『平民化』趋势明朗：高端能力向下渗透、单位智能成本持续走低。对做 AI 产品的团队，这直接降低了试错和规模化成本——原来因为调用费犹豫的功能现在可以放心上线。同时也提醒 PM：当模型能力趋同且便宜，『我用了最先进的模型』不再构成卖点，用户感知不到的底层升级不如转化为更稳定、更便宜、更懂场景的体验。",
+    "link": "https://presenc.ai/research/july-2026-llm-release-roundup",
+    "tag": "行业动态"
+   },
+   {
+    "t": "DeepSeek V4 完成 API 迭代，V4Flash 成新默认",
+    "s": "DeepSeek 完成 V4 系列的 API 迭代，旧版 API 别名正式退役，V4Flash 全面接替成为默认版本，标志其进入产品矩阵稳定化阶段。对开发者而言，这次迭代最重要的不是参数而是『可预期』：接口稳定、文档收敛、版本有明确生命周期，意味着可以放心把 DeepSeek 写进生产环境。V4Flash 延续了 DeepSeek 一贯的高性价比路线，在中文理解与代码场景表现稳健，常被用作成本敏感型任务的默认选项。对做出海或国内应用的 PM，DeepSeek 的价值在于『国产可控 + 价格友好』，适合做大规模预处理、审核、摘要等高频低客单价环节。建议团队建立模型路由层，把 DeepSeek 放在对成本最敏感的路径上，把更强的闭源模型留给关键决策环节。",
+    "link": "https://weibo.com/2677194735/5325307063829299",
+    "tag": "国产模型"
+   },
+   {
+    "t": "OpenAI 推企业软件 Presence，进军自动化办公",
+    "s": "OpenAI 推出企业软件产品 Presence，定位客户支持与销售流程的自动化，标志其战略从消费级 ChatGPT 向企业级应用层延伸。这与微软 Copilot、Salesforce Agentforce 的正面竞争正式打响。Presence 的打法是把 LLM 直接嵌进企业工作流，替代部分重复性白领任务，而非只做对话入口。对 PM 而言，这是『AI 原生应用』从玩具走向生产力工具的代表案例：价值不再来自模型本身，而来自对业务流程的理解与系统集成。值得借鉴的是它的 GTM 思路——不直接卖模型 API，而是卖『省下的人力工时』。做 B 端产品的团队应关注：企业客户要的是可审计、可集成、可量化的结果，而非炫技的演示。Presence 也预示下一波 AI 创业机会在垂直流程的『最后一公里』自动化。",
+    "link": "https://weibo.com/2677194735/5325307063829299",
+    "tag": "AI 应用"
+   }
+  ]
+ },
+ {
+  "cat": "产品经理",
+  "items": [
+   {
+    "t": "Vibe Coding：不会写代码成伪命题，PM 最该学",
+    "s": "Vibe Coding 的流行正在改写『谁来做产品』的边界：用自然语言指挥 AI 完成功能开发，过去产品、设计、前端、后端七种角色被压缩成『你与 AI 的对话』。对产品经理而言，这是历史上离亲手把想法变成可用产品最近的一次——你不再被『等排期、等开发』卡住，可以自己跑通原型甚至小功能。但『不会写代码』正在变成伪命题：你至少要懂基本逻辑、能读改动、会调试报错，否则 AI 产出的代码你无法判断好坏，容易被带偏。建议 PM 把 Vibe Coding 当必备技能练：从改自己的落地页、做个小工具开始，建立对代码结构、API、部署的直觉。真正的红利不是『取代工程师』，而是 PM 能用自己的手验证想法，把沟通损耗降到最低，让工程资源集中在真正复杂的部分。",
+    "link": "https://www.toutiao.com/article/7663856351969296902/",
+    "tag": "Vibe Coding"
+   },
+   {
+    "t": "产品经理 Vibe Coding 实战：AI Agent 打通原型到代码",
+    "s": "Vibe Coding 落到实战，关键拐点来自 MCP（Model Context Protocol）这类协议——它让编码工具能直接读取你的原型文件、设计稿与需求文档，PM 从『画图的人』升级成『AI Agent 的指挥官』。具体工作流通常是：先用 Figma 或草图定义界面与交互，再通过 Agent 把设计稿转成可运行的前端，接上真实 API，最后自己点测验收。这把过去『需求评审 → 排期 → 联调』的线性流程压缩成一个下午的迭代循环。但要注意：Agent 擅长生成『看起来对』的代码，边界条件、性能与安全往往欠考虑，PM 必须守住验收关。实战建议是分小步、频繁验证、把可逆操作交给 AI、把不可逆决策留给自己。会这种打法的 PM，在创业团队里价值会指数级放大。",
+    "link": "https://adg.csdn.net/6a583530662f9a54cb8fd611.html",
+    "tag": "AI Agent"
+   },
+   {
+    "t": "2026 年 12 款 Vibe Coding 工具横评",
+    "s": "市面上的 Vibe Coding 工具已分化为两条路线。一类面向专业开发者：Cursor、Windsurf、Claude Code、Devin、Cline 等，强调对代码库的深度理解、多文件重构与自主调试，适合在已有项目里高效推进。另一类面向非技术创始人：Lovable、Bolt、Replit、v0 等，主打从一句话生成完整可部署应用，把数据库、鉴权、部署都包圆，让不会代码的人也能出活。横评的核心结论是：选错类别比选贵了更糟。如果你要改一个成熟产品，用开发者向工具；如果你要从零验证一个想法，用非技术向工具更快。PM 尤其值得掌握后者——它让你在不占用工程资源的情况下，把『我觉得该做个 X』变成『我已经做出个 X 给你看』，沟通效率天差地别。",
+    "link": "https://webfixtool.com/blog/best-vibe-coding-tools",
+    "tag": "工具链"
+   },
+   {
+    "t": "AI 原生 IDE 与编码 Agent：开发者 vs 非技术创始人怎么选",
+    "s": "同一类 AI 编码工具，在不同人手里是两种物种。对开发者，AI 原生 IDE（如 Cursor、Claude Code）是『副驾』：他清楚每段代码的意图，让 Agent 处理样板与重构，自己把控架构与关键逻辑，效率提升来自减少重复劳动。对非技术创始人，同样的工具是『整车代驾』：他看不懂代码，只能靠自然语言描述目标，赌 Agent 一次跑通，失败成本更高。选型建议很直接——按你在建什么来挑：做长期维护的产品，选能融入工程规范的 IDE；做一次性验证的 MVP，选端到端生成型平台。PM 处于两者之间，最划算的策略是：用生成型平台快速做原型验证需求，验证成立后再交给工程师用专业 IDE 重写生产级代码，既快又不欠技术债。",
+    "link": "https://webfixtool.com/blog/best-vibe-coding-tools",
+    "tag": "工具趋势"
+   }
+  ]
+ },
+ {
+  "cat": "电商",
+  "items": [
+   {
+    "t": "SHEIN 第三方平台占比 14.3%，全球时尚格局生变",
+    "s": "SHEIN 最新披露的数据显示，其第三方平台（Marketplace）商品占比已达 14.3%，同时整体净利下滑至 20.64 亿美元，折射出这家快时尚巨头正在从『自营直营』向『平台化』艰难转身。与此同时，YouTube 在英国推出购物联盟、Facebook 上线卖家 App，内容平台与电商的边界进一步模糊。对跨境卖家而言，信号很明确：流量正在从中心化货架流向内容场，单纯靠低价铺货的红利在退潮。SHEIN 做平台，意味着它要引入第三方卖家补齐品类与本地履约，卖家有机会借它的流量，但也要接受更严的规则与更薄的利差。PM 与品牌方的启发是：不要把渠道押在单一平台，内容电商（短视频/直播/联盟）与货架电商要并行布局，用内容种草、用货架承接，才能应对平台格局的频繁洗牌。",
+    "link": "https://www.ebrun.com/20260728/690661.shtml",
+    "tag": "跨境平台"
+   },
+   {
+    "t": "跨境电商 2026 拐点：Shopify 商家 31% GMV 来自跨境",
+    "s": "2026 年跨境电商站上拐点，数据显示 Shopify 商家的 GMV 中已有 31% 来自跨境订单，中小企业跨境占比更高达 38%，主要由西欧、海湾与东南亚市场拉动。这说明『基础设施借口已消失』——支付、物流、合规、本地化工具链足够成熟，小团队也能做全球生意，门槛从『能不能做』变成『做得好不好』。对独立站卖家，机会在细分品类与区域深耕：海湾的高客单、东南亚的高增速、西欧的成熟付费习惯各有打法。PM 视角下，拐点意味着竞争从『有没有海外版』升级为『本地化体验多深』——货币、语言、履约时效、退换政策、客服时区，每一项都直接影响转化。建议把跨境当作产品功能而非渠道分支来设计，用一套可配置的本地化中台支撑多市场，而不是为每个国家硬抄一套。",
+    "link": "https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2",
+    "tag": "跨境趋势"
+   },
+   {
+    "t": "希音计划 8 月港 IPO 融资 30 亿美元；亚马逊旺季配送费 10 月生效",
+    "s": "两条资本与成本信号叠加出现。其一是希音（SHEIN）计划 8 月在香港 IPO、募资约 30 亿美元，若成行将是中国出海品牌资本化的重要里程碑，也倒逼同行加速规范化；其二是亚马逊宣布旺季配送费将于 10 月生效，意味着下半年大促期间履约成本抬升，卖家利润承压。一松一紧之间，中国出海的逻辑在变：从『拼价格、冲规模』转向『拼价值、拼全球化治理能力』。对卖家和 PM 的实操启示是，定价模型要把旺季附加费前置算进毛利，避免大促『增收不增利』；同时希音上市会拉高整个赛道的合规与透明度预期，早做税务、知识产权、数据合规的团队更稳。长期来看，愿意在品牌与供应链上下功夫的玩家，才扛得住资本与平台规则的双重审视。",
+    "link": "https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991",
+    "tag": "资本动态"
+   },
+   {
+    "t": "Amazon 标题砍到 75 字符；TikTok Shop 测试订阅",
+    "s": "平台规则在 7 月密集调整。亚马逊把产品标题上限砍到 75 字符，逼卖家放弃堆砌关键词的『SEO 标题党』，回归清晰表达；TikTok Shop 则在 8 个类目上线订阅功能，并测试 Shop Plus 会员体系，把复购锁进订阅关系。两条动作指向同一趋势：平台在主动治理生态质量，并把流量从『一次性转化』推向『长期用户资产』。对卖家，标题变短意味着要把核心卖点前置、用主图与 A+ 内容补位；订阅功能则是高复购品类（耗材、宠物、美妆）的新增长杠杆，值得提前设计订阅权益。PM 的启示是：在平台型产品里，规则变化就是需求变化——要建『规则监控 → 快速改版』的响应机制，谁先适配谁吃红利。中国关税上限维持 20%，也提示成本侧仍需保守测算。",
+    "link": "https://www.directtoconsumer.co/newsletter/amazon-product-title-update-meta-campaign-structure-tiktok-subscriptions",
+    "tag": "平台规则"
+   },
+   {
+    "t": "TikTok 多国社交购物渗透率超 FB/IG",
+    "s": "数据揭示社交购物的地域格局：马来西亚 95%、泰国 93%、沙特 77%、英国 72% 的社交用户已在 TikTok 等平台产生过购物行为，渗透率全面超过 Facebook 与 Instagram。驱动核心是『短视频 + 即时购物』的组合——内容即货架，刷到即买到，决策链路被压缩到极致。对出海卖家，这意味着东南亚与中东是社交电商的天然沃土，达人短视频、直播带货的 ROI 远高于传统投放。PM 的产品启发是：在这些市场，独立站不应只做落地页，而要成为『内容引流后的承接与复购中枢』，用 TikTok 做爆发、用私域与会员做留存。同时要适配本地支付与物流节奏——沙特货到付款占比仍高，履约设计必须贴合。社交购物渗透超传统社媒，是 2026 最值得押注的消费行为变化之一。",
+    "link": "https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991",
+    "tag": "社交电商"
+   }
+  ]
+ },
+ {
+  "cat": "海外独立站",
+  "items": [
+   {
+    "t": "Shopify 将 Shop Campaigns 扩至澳大利亚：成交后才收费",
+    "s": "Shopify 把其广告产品 Shop Campaigns 扩展到澳大利亚，最大亮点是『成交后才收费』（pay-per-purchase）的计费模式：商家自设获客成本上限，平台只在产生真实购买后才扣费，把广告风险从『花了多少』转移到『赚了多少』。这对中小卖家是重大利好——获客门槛显著降低，不必再为点击和曝光预付不确定回报的费用。对独立站 PM，这个模式值得借鉴：它把增长团队的 KPI 从『曝光/点击』对齐到『成交』，倒逼投放系统优化真实转化而非虚荣指标。落地层面，商家需要把像素、转化回传、归因配置干净，否则平台无法准确计费。建议在澳大利亚市场试水的卖家先用小预算跑通归因闭环，再放大。它也预示主流广告正在从『按注意力收费』走向『按结果收费』，对 DTC 是长期友好趋势。",
+    "link": "https://www.amz123.com/kx/bl5BXx9Q",
+    "tag": "Shopify 广告"
+   },
+   {
+    "t": "SHOPLINE 与 Shopify 两年版权诉讼和解，中小商家免整改",
+    "s": "历时两年的 SHOPLINE 与 Shopify 版权诉讼以和解告终，Shopify 撤销全部诉讼，使用涉诉模板的中小商家无需更换主题，店铺零影响。这对生态是颗定心丸：过去商家最怕『用的模板突然被告侵权、被迫停业整改』，如今不确定性解除。对独立站 PM 与卖家，启示有两点。其一，选型时优先用有清晰授权与合规声明的模板/插件，把法律风险前置排查，别等纠纷找上门。其二，过度依赖单一平台或供应商的专有组件有脆弱性，关键能力（如主题、支付、邮件）尽量保留可迁移性，万一合作生变能快速切换。和解也反映大厂对生态的克制——赶尽杀绝不符长期利益。中小商家可趁此窗口安心经营，把精力放回选品与转化，而非担心法务风险。",
+    "link": "https://so.html5.qq.com/page/real/search_news?docid=70000021_4626a6380f882152",
+    "tag": "行业合规"
+   },
+   {
+    "t": "跨境电商进入整合期：本地支付成关键",
+    "s": "跨境电商进入整合期，一个被低估的关键变量是本地支付。数据表明，提供 3 种以上本地支付方式的商家，弃单率比仅支持国际信用卡的低 31%——在巴西的 Pix、东南亚的 GCash、海湾的 Mada 等市场，用户根本不信任或不持有 Visa/MasterCard。与此同时，加拿大、海湾、东南亚三条线同步增长，市场从『广撒网』转向『区域深耕』。对独立站 PM，本地化支付不是『加个选项』而是转化引擎：要在结账页按 IP/语言动态排序支付方式、处理好本币展示与汇率、规避隐性手续费引发的弃单。整合期还意味着流量成本上升、同质化加剧，谁能把『最后一公里』（支付、履约、客服）做顺，谁就剩者为王。建议把支付成功率当核心指标盯，而非只看流量。",
+    "link": "https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026",
+    "tag": "本地化"
+   },
+   {
+    "t": "AI 本地化让中小卖家转化率提升 19%",
+    "s": "一项对比显示，采用 AI 本地化的中小卖家转化率平均提升 19%，差异在文化距离大的市场（如日韩、中东）最为明显——『文化适配叙事』远比『机器翻译』更能打动本地用户。具体做法是用 AI 做不只是语言转换的本地化：改写符合本地表达习惯的文案、适配节庆与敏点、调整卖点排序以匹配本地价值排序（例如日本重细节与安心感、中东重家庭与体面）。对独立站 PM，这是低门槛高回报的优化点：把商品描述、落地页、邮件都过一遍『本地叙事』而非直译，往往比加预算投放更划算。但要注意 AI 本地化需有人把关，避免文化误用与事实错误。建议建一个『本地化风格指南』喂给模型，让输出稳定可控。19% 的提升证明，语言是转化的隐形天花板。",
+    "link": "https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026",
+    "tag": "AI 本地化"
+   },
+   {
+    "t": "欧盟 ICS2 第三阶段强制，HS 编码库成护城河",
+    "s": "欧盟 ICS2（进口管制系统）第三阶段强制执行，要求入境前提交完整、准确的货物数据，HS 编码的准确度成为合规命脉。早做合规准备的商家，欧洲订单的利润率显著高于仍靠 workaround 应付的对手——因为被拦、退运、罚款的隐形成本会直接吃掉毛利。对独立站 PM 与卖家，启示是把『合规数据』当成产品能力来建：维护一套准确、可自动匹配的 HS 编码库，在结账/发货环节就校验申报要素，而不是事后补救。这恰恰能成为护城河——合规能力强的团队能稳定履约、敢接大单，而临时抱佛脚者动辄翻车。在欧洲这种高客单市场，合规即竞争力。建议把 ICS2 要求前置到选品与建站流程，把『能不能顺利送达』作为体验的一部分来设计，而非物流部门的琐事。",
+    "link": "https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2",
+    "tag": "合规"
+   }
+  ]
+ },
+ {
+  "cat": "产品sense",
+  "items": [
+   {
+    "t": "Amazon PM Product Sense 六步框架",
+    "s": "Amazon 的 Product Sense 面试有套经典六步框架：clarify（澄清问题边界与目标）→ segment（拆分用户/场景/市场）→ metric（定义衡量成功的指标）→ options（列出候选方案）→ tradeoff（权衡取舍，说清为什么放弃别的）→ pressure test（压力测试，设想边界与失败）。它之所以被奉为标杆，是因为逼你在『没有标准答案』时展现出结构化思考，而不是背套路。对 PM 的实战价值在于：日常需求评审也可用这套——先确认要解决的真问题，再分人群看差异，定指标防跑偏，列方案后主动讲取舍。面试官看重的不是结论多惊艳，而是『思路是否自洽、是否站在用户与业务两侧权衡』。练习方法是拿真实产品（如外卖、相册）随机出题自问自答，录音复盘逻辑断点。六步练熟后，面对模糊问题不再慌，答案有结构又不显浅。",
+    "link": "https://sirjohnnymai.com/zh/blog/amazon-pm-product-sense-the-framework-that-gets-you-hired",
+    "tag": "面试框架"
+   },
+   {
+    "t": "如何培养 Product Sense（哪怕你不是 PM）",
+    "s": "Product Sense 不是 PM 专属，而是一种『对用户与产品的判断力』，任何人都能练。一个被验证的 30 天计划是：第 1 周做『留意』，每天记录一个让你觉得好用或别扭的产品细节，问自己为什么；第 2 周做『拆解』，挑一个 App 画它的用户旅程与关键决策点，理解设计背后的取舍；第 3 周『见真实用户』，找 3-5 个身边人看他们如何用产品，记录你意想不到的行为；第 4 周『开口练』，把观察写成短文或讲给同事听，接受反馈。核心心法是做 reps（重复次数）——判断力像肌肉，靠高频刻意练习而非看教程长出。哪怕不做 PM，这种训练也能让你在汇报、协作、创业时更快抓住重点。关键在坚持每天一个小观察，把『我觉得』慢慢变成『我观察到、所以判断』。",
+    "link": "https://hellopm.co/how-to-develop-product-sense",
+    "tag": "能力培养"
+   },
+   {
+    "t": "Product Sense 2026 指南：沉浸用户、研究产品、练习拆解",
+    "s": "2026 年的 Product Sense 指南把能力来源拆成三块：沉浸用户、研究产品、练习拆解。沉浸用户强调『成为用户』而非『访谈用户』——亲自高频使用竞品与目标产品，感知真实痛点，比看报告更准；研究产品是建立『模式库』，看到新功能能迅速类比到已知范式，判断它是延续还是创新；练习拆解则是把模糊问题结构化，像肌肉记忆一样反应。指南特别指出，产品感不是天赋而是可刻意练习的判断力，难点在『内化框架』——知道 CIRCLES、JTBD 之后，要在不被提醒时自然调用。给 PM 的建议：少囤方法论，多泡在真实使用场景里，每周拆一个产品写在公开处接受检验。当拆解变成直觉，你在会议里给出的判断就会又快又稳，这正是高级 PM 与初级的本质分野。",
+    "link": "https://www.parallelhq.com/blog/what-product-sense",
+    "tag": "能力培养"
+   },
+   {
+    "t": "Product Sense 面试指南：CIRCLES 框架 + 40+ 练习题",
+    "s": "CIRCLES 是 Product Sense 面试最常用框架：Comprehend（理解题意与用户）→ Identify（锁定核心用户与痛点）→ Report（陈述你的目标/假设）→ Cut（做优先级裁剪，聚焦）→ List（列出解决方案）→ Evaluate（评估并选最优）→ Summarize（总结回顾）。它占大厂 PM 面试权重约 30-40%，是必须练熟的硬通货。指南配套 40+ 练习题，覆盖『设计一款给老人的相册 App』『提升外卖完单率』等经典题，建议限时口述自练。使用要点：别把框架当背诵，面试官的期待是『自然流出来』；前两步（理解+锁定用户）最易被轻视却最致命，错配用户全崩；Cut 环节体现取舍勇气。练熟后，即便抽到陌生题也能稳住节奏。对想进大厂的 PM，CIRCLES 是性价比最高的准备投入，配合真实产品拆解，面试通过率显著提升。",
+    "link": "https://bestpmjobs.com/resources/product-sense-interview",
+    "tag": "面试框架"
+   }
+  ]
+ }
 ]
