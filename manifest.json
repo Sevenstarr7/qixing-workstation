@@ -1,0 +1,16 @@
+{
+  "name": "七星堆肥厂",
+  "short_name": "七星",
+  "description": "七星堆肥厂 · 精神增肌中…请勿投喂五花肉 | 力训记录+动作库、变美tips、资讯雷达、宠物情报、复盘与灵感",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

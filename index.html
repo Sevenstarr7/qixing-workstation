@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="七星堆肥厂">
+<meta name="theme-color" content="#d4c4a8">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<title>七星堆肥厂</title>
+<style>
+:root{
+  --wall:#e6dcc8;--floor:#c9b08d;
+  --paper:#faf6ef;--paper2:#f5efe5;
+  --ink:#4a4035;--ink2:#6b5e4f;--muted:#9a8b7a;
+  --line:#d8cfc0;
+  --olive:#6b8e5e;--olive2:#e8efe3;
+  --coral:#e07a5f;--coral2:#f9ddd6;
+  --honey:#e8c97a;--honey2:#faf0d8;
+  --mint:#7db5a8;--mint2:#e3f0ed;
+  --sky:#9bbcd3;--sky2:#e8f1f6;
+  --rose:#d68a8a;  --rose2:#f5dede;
+  /* room scene vars (default = warm beige) */
+  --w1:#e8decf;--w2:#ded2bd;--w3:#d4c6ad;--f1:#cfba9c;--f2:#c9b08d;
+  --cur:#3d6659;--cur2:#4a7a6a;--pl:#6b8e5e;--pp:#a67c52;--rug:#8fb8c9;
+  --ls:#e8c97a;--lst:#8b7355;--lb:#8b7355;--fb:#f5efe5;--fbg:#7db5a8;
+  --accent-d:#c05e45;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",system-ui,sans-serif;background:var(--wall);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.hand{font-family:'ZCOOL KuaiLe',cursive;letter-spacing:.5px}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding:18px 16px calc(160px + var(--safe-b));position:relative;overflow-x:hidden}
+
+/* hand-painted room background - full SVG scene */
+.room-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.room-bg svg.scene{width:100%;height:100%}
+.room-bg .scene-group{opacity:0;transition:opacity .6s ease}
+body[data-dow="1"] .scene-group.g1,body[data-dow="2"] .scene-group.g2,body[data-dow="3"] .scene-group.g3,body[data-dow="4"] .scene-group.g4,body[data-dow="5"] .scene-group.g5,body[data-dow="6"] .scene-group.g6,body[data-dow="7"] .scene-group.g7{opacity:1}
+.room-bg .base-wall{fill:url(#wallGrad)}
+.room-bg .base-floor{fill:url(#floorGrad)}
+.room-bg .curtain{fill:var(--cur)}
+.room-bg .curtain-band{fill:var(--cur2)}
+.room-bg .window-frame{fill:none;stroke:rgba(110,90,70,.55);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.room-bg .window-glass{fill:rgba(255,255,255,.22)}
+.room-bg .window-sash{stroke:rgba(110,90,70,.4);stroke-width:2;stroke-linecap:round}
+.room-bg .plant-leaf{fill:var(--pl)}
+.room-bg .plant-pot{fill:var(--pp)}
+.room-bg .rug{fill:var(--rug);opacity:.35}
+.room-bg .lamp-shade{fill:var(--ls)}
+.room-bg .lamp-stand{fill:var(--lst)}
+.room-bg .foodbag{fill:var(--fb);stroke:var(--line);stroke-width:2}
+.room-bg .foodbag-circle{fill:var(--fbg);opacity:.5}
+
+.paper-noise{filter:url(#paperFilter)}
+
+h1{font-family:'ZCOOL KuaiLe',cursive;font-size:28px;margin:0 0 4px;font-weight:400;line-height:1.2}
+h2{font-family:'ZCOOL KuaiLe',cursive;font-size:20px;margin:0 0 10px;font-weight:400}
+h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
+.sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.view{display:none;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+.view.active{display:block}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+/* paper cards with hand-torn feel */
+.card{background:var(--paper);border-radius:24px 20px 28px 22px;padding:16px;margin-bottom:14px;box-shadow:0 6px 0 rgba(90,78,60,.1),0 12px 24px rgba(90,78,60,.08);border:2px dashed var(--line);position:relative;overflow:visible}
+.card:nth-child(even){border-radius:20px 26px 22px 28px}
+.card::before{content:"";position:absolute;top:6px;right:8px;width:28px;height:28px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='16' cy='22' rx='10' ry='8' fill='%23e8e0d0'/%3E%3Ccircle cx='10' cy='14' r='4' fill='%23e8e0d0'/%3E%3Ccircle cx='22"+
+ "cy='14' r='4' fill='%23e8e0d0'/%3E%3Ccircle cx='16' cy='10' r='4' fill='%23e8e0d0'/%3E%3Ccircle cx='13' cy='20' r='1.2' fill='%239a8b7a'/%3E%3Ccircle cx='19' cy='20' r='1.2' fill='%239a8b7a'/%3E%3Cpath d='M14 23.5c1.2 .8 2.8 .8 4 0' stroke='%239a8b7a' fill='none' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center;background-size:contain;opacity:.5}
+.card.tap{cursor:pointer;transition:transform .12s}
+.card.tap:active{transform:scale(.97) rotate(0)}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.muted{color:var(--muted)}
+.sm{font-size:12px}
+.xs{font-size:10px}
+
+/* tags like stickers */
+.tag{display:inline-block;font-family:'ZCOOL KuaiLe',cursive;font-size:11px;padding:4px 10px;border-radius:14px 16px 12px 18px;background:var(--coral2);color:#a8523c;font-weight:400;border:2px dashed #f0c4b8;transform:rotate(-1deg)}
+.tag.gold{background:var(--honey2);color:#8a6a25;border-color:#e8d89a;transform:rotate(1deg)}
+.tag.mint{background:var(--mint2);color:#3a7a6a;border-color:#a8d4c8}
+.tag.sky{background:var(--sky2);color:#4a6f85;border-color:#b8d2e3}
+
+/* chubby hand-stamped buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:24px 20px 26px 22px;padding:12px 20px;font-size:15px;font-family:'ZCOOL KuaiLe',cursive;cursor:pointer;background:var(--coral);color:#fff;transition:transform .12s,box-shadow .12s;box-shadow:0 4px 0 var(--accent-d),0 6px 12px rgba(0,0,0,.15);transform:rotate(-.5deg)}
+.btn:active{transform:translateY(3px) rotate(0);box-shadow:0 1px 0 var(--accent-d),0 2px 6px rgba(0,0,0,.1)}
+.btn.ghost{background:var(--paper2);color:var(--coral);box-shadow:0 4px 0 #e0d5c8,0 3px 8px rgba(90,78,60,.1)}
+.btn.ghost:active{box-shadow:0 1px 0 #e0d5c8}
+.btn.mint{background:var(--mint);color:#fff;box-shadow:0 4px 0 #5f968a,0 6px 12px rgba(125,181,168,.25)}
+.btn.mint:active{box-shadow:0 1px 0 #5f968a}
+.btn.honey{background:var(--honey);color:#5a4315;box-shadow:0 4px 0 #c9ae63,0 6px 12px rgba(232,201,122,.25)}
+.btn.honey:active{box-shadow:0 1px 0 #c9ae63}
+.btn.olive{background:var(--olive);color:#fff;box-shadow:0 4px 0 #55754a,0 6px 12px rgba(107,142,94,.25)}
+.btn.olive:active{box-shadow:0 1px 0 #55754a}
+.btn.sm{padding:8px 14px;font-size:13px;width:auto}
+
+/* sketchbook inputs */
+input,textarea,select{font-family:inherit;font-size:14px;width:100%;border:2px dashed var(--line);border-radius:16px 20px 14px 22px;padding:12px 14px;background:#fff;color:var(--ink);outline:none;box-shadow:0 3px 0 #e8e0d5 inset}
+input:focus,textarea:focus,select:focus{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral2)}
+textarea{resize:vertical;min-height:72px}
+label.fl{font-size:12px;color:var(--ink2);margin-bottom:6px;display:block;font-weight:700}
+
+/* chips */
+.chips{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;-ms-overflow-style:none;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border:2px dashed var(--line);background:var(--paper);color:var(--muted);padding:8px 16px;border-radius:20px 18px 22px 16px;font-size:13px;font-family:'ZCOOL KuaiLe',cursive;cursor:pointer;transition:.15s;box-shadow:0 3px 0 #e0d5c8}
+.chip.active{background:var(--olive);color:#fff;border-style:solid;border-color:var(--olive);box-shadow:0 4px 0 var(--accent-d)}
+.chip:active{transform:translateY(1px)}
+
+/* exercise rows */
+.ex-row{display:flex;gap:8px;align-items:center;background:var(--paper2);border-radius:16px 20px 14px 22px;padding:10px;margin-bottom:10px;flex-wrap:wrap;border:2px dashed var(--line);transform:rotate(-.3deg)}
+.ex-row input{flex:1;min-width:0;box-shadow:none}
+.ex-row .mini{width:56px}
+.ex-row .del{width:34px;padding:10px 0;text-align:center;background:var(--rose2);color:#a85a5a;border:0;border-radius:12px 16px 10px 18px;font-size:18px;cursor:pointer;box-shadow:0 3px 0 #dcc0c0}
+.ex-row .del:active{box-shadow:0 1px 0 #dcc0c0;transform:translateY(1px)}
+
+/* list items */
+.list-item{display:flex;gap:12px;padding:12px 0;border-bottom:2px dashed var(--line)}
+.list-item:last-child{border-bottom:0}
+.empty{text-align:center;color:var(--muted);padding:18px 0 12px;font-size:13px}
+.empty .cat-illu{display:block;margin:0 auto 10px;animation:float 3.5s ease-in-out infinite}
+
+/* bottom nav floating hand-drawn dock */
+.bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:calc(100% - 28px);max-width:444px;background:var(--paper);backdrop-filter:blur(12px);border-radius:30px 26px 32px 28px;padding:8px 6px calc(6px + var(--safe-b));z-index:50;box-shadow:0 8px 0 rgba(90,78,60,.15),0 14px 28px rgba(90,78,60,.15);border:2px dashed var(--line);display:flex;height:68px;transform:translateX(-50%) rotate(-.3deg)}
+.bottomnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--muted);cursor:pointer;font-weight:700;border-radius:18px 16px 20px 14px;padding:6px 2px;transition:.15s;font-family:'ZCOOL KuaiLe',cursive}
+.bottomnav button.active{color:#fff;background:var(--olive);box-shadow:0 4px 0 var(--accent-d);transform:translateY(-4px)}
+.bottomnav .ic{font-size:20px;line-height:1}
+
+/* hero scene */
+.hero{background:var(--paper);border-radius:34px 30px 38px 28px;padding:22px 20px 26px;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 8px 0 rgba(90,78,60,.12),0 16px 32px rgba(90,78,60,.1);border:3px dashed var(--line);transform:rotate(-.4deg)}
+.hero .scene{position:absolute;right:-8px;bottom:-12px;width:150px;height:130px;opacity:.95;animation:float 4.5s ease-in-out infinite}
+.hero h1{color:var(--ink);font-size:32px}
+.hero .sub{color:var(--muted);margin-bottom:8px}
+.hero .slogan{font-size:13px;color:var(--olive);background:var(--olive2);display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:20px 18px 22px 16px;font-family:'ZCOOL KuaiLe',cursive;border:2px dashed #bcd3b0}
+
+/* quick cards */
+.qcards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qcard{background:var(--paper);border-radius:24px 28px 20px 32px;padding:16px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .12s;box-shadow:0 5px 0 rgba(90,78,60,.12),0 8px 20px rgba(90,78,60,.1);border:2px dashed var(--line);position:relative;overflow:hidden;transform:rotate(-.5deg)}
+.qcard:nth-child(even){transform:rotate(.5deg)}
+.qcard:active{transform:scale(.97) rotate(0)}
+.qcard .qi{font-size:28px;z-index:2}
+.qcard .qt{font-size:15px;font-family:'ZCOOL KuaiLe',cursive;margin-top:4px;z-index:2}
+.qcard .qd{display:none;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;z-index:2}
+.qcard .scene-ic{position:absolute;right:-6px;bottom:-10px;width:70px;height:60px;opacity:.35}
+
+/* toggles */
+.toggle{width:50px;height:28px;border-radius:20px;background:#e0d5c8;border:0;position:relative;cursor:pointer;flex:none;transition:background .2s;box-shadow:0 3px 0 #cfc4b5 inset}
+.toggle.on{background:var(--mint);box-shadow:0 3px 0 #5f968a inset}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:left .2s}
+.toggle.on::after{left:25px}
+
+/* checks */
+.check{width:26px;height:26px;border-radius:10px 14px 9px 13px;border:3px solid #d8cfc0;flex:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:all .15s;background:#fff}
+.check.on{background:var(--olive);border-color:var(--olive);box-shadow:0 3px 0 #55754a}
+
+.sep{height:2px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:16px 0;border:none}
+.hint{font-size:12px;color:var(--ink2);background:var(--honey2);border-radius:18px 22px 16px 24px;padding:12px 14px;margin-top:10px;line-height:1.6;border:2px dashed #e8d89a;position:relative}
+.hint::before{content:"💡";margin-right:6px}
+
+/* article cards unified - paper */
+.art-card{background:var(--paper2);border-radius:20px 24px 18px 26px;padding:14px;margin-bottom:10px;border:2px dashed var(--line);position:relative;transition:transform .12s}
+.art-card:nth-child(even){}
+.art-card:active{transform:scale(.98) rotate(0)}
+.art-card .cat-paw{position:absolute;top:8px;right:10px;opacity:.25}
+.art-card .art-title{font-family:'ZCOOL KuaiLe',cursive;font-weight:400;font-size:16px;line-height:1.45;color:var(--ink)}
+.art-card .art-sum{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55}
+.art-card .art-actions{display:flex;gap:8px;margin-top:10px}
+.art-card .art-actions button{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:6px 12px;border-radius:16px 18px 14px 20px;border:2px dashed var(--line);background:#fff;color:var(--muted);cursor:pointer;transition:.15s;font-family:'ZCOOL KuaiLe',cursive}
+.art-card .art-actions button:active{transform:translateY(1px)}
+.art-card .art-actions button.on.liked{background:var(--coral2);color:#a8523c;border-color:#f0c4b8}
+.art-card .art-actions button.on.saved{background:var(--honey2);color:#8a6a25;border-color:#e8d89a}
+.art-card.learned{opacity:.78}
+.art-card.learned .art-title{text-decoration:line-through;color:var(--muted)}
+.art-card .art-actions button.on{background:var(--honey2);color:#8a6a25;border-color:#e8d89a}
+.big-btn{display:block;width:100%;padding:13px;border:none;border-radius:16px;background:var(--honey);color:#5a4315;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #c9ae63;transition:.1s}
+.big-btn.on{background:#bfe3c0;color:#234a25;box-shadow:0 4px 0 #9cc6a0}
+.big-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #c9ae63}
+.article-body p{margin:0 0 13px;line-height:1.8;font-size:15px;color:#3a2e22}
+.article-body p:last-child{margin-bottom:0}
+.art-btn-x{width:28px;height:28px;border:none;background:var(--paper2);color:var(--muted);border-radius:50%;font-size:14px;cursor:pointer;line-height:1;box-shadow:0 2px 0 #e0d5c8;transition:.1s}
+.art-btn-x:active{transform:translateY(1px);box-shadow:0 1px 0 #e0d5c8;background:var(--coral2);color:var(--coral)}
+
+/* body muscle svg */
+.body-box{background:var(--paper2);border-radius:24px 28px 20px 32px;padding:14px 10px;border:2px dashed var(--line);margin-bottom:12px;transform:rotate(-.3deg)}
+.body-svg{display:flex;gap:14px;justify-content:center}
+.body-svg .bv{text-align:center}
+.body-svg .bv svg{display:block;margin:0 auto}
+.body-svg .lbl{font-size:11px;color:var(--muted);margin-top:4px;font-family:'ZCOOL KuaiLe',cursive}
+.last-rec{font-size:11px;color:#3a7a6a;background:var(--mint2);border-radius:10px 14px 9px 13px;padding:4px 10px;margin:4px 0 10px;display:inline-block;border:2px dashed #a8d4c8;font-weight:600}
+
+/* section header with cat */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sec-head .cat-mini{width:34px;height:34px}
+
+/* streak/gamification badges */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-family:'ZCOOL KuaiLe',cursive;padding:4px 10px;border-radius:14px 16px 12px 18px;background:var(--honey2);color:#8a6a25;border:2px dashed #e8d89a;transform:rotate(-1deg)}
+.badge.mint{background:var(--mint2);color:#3a7a6a;border-color:#a8d4c8}
+.badge.sky{background:var(--sky2);color:#4a6f85;border-color:#b8d2e3}
+
+/* confetti */
+.confetti{position:fixed;pointer-events:none;z-index:100;font-size:18px;animation:confettiFall 1.2s ease-out forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(120px) rotate(720deg)}}
+
+/* plan list */
+.plan-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px 20px 14px 22px;padding:12px;margin-bottom:8px;border:2px dashed var(--line);transform:rotate(-.3deg)}
+
+/* history table */
+.ex-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;background:rgba(255,255,255,.6);border-radius:10px;overflow:hidden}
+.ex-table th{background:var(--coral2);color:#a8523c;padding:6px 4px;font-weight:700}
+.ex-table td{padding:6px 4px;border-bottom:1px dashed var(--line);text-align:center}
+.ex-table tr:last-child td{border-bottom:0}
+
+/* reflection history item */
+.rf-item{background:#fff;border-radius:16px 20px 14px 22px;padding:12px;margin-bottom:8px;border:2px dashed var(--line);transform:rotate(-.3deg)}
+
+/* floating cat decoration on sections */
+.floating-cat{position:absolute;right:14px;top:14px;width:40px;height:40px;opacity:.5;animation:float 3.5s ease-in-out infinite}
+
+/* link style */
+a.pri-link{color:var(--coral);text-decoration:none;font-weight:700;border-bottom:2px dashed var(--coral2)}
+
+/* tarot/achievement card style */
+.tarot-card{background:var(--paper);border-radius:18px 16px 22px 20px;padding:12px;border:3px solid var(--line);box-shadow:0 5px 0 rgba(90,78,60,.12);position:relative;overflow:hidden}
+.tarot-card .frame{position:absolute;inset:6px;border:2px dashed var(--line);border-radius:12px 10px 16px 14px;pointer-events:none}
+.tarot-card .illus{height:90px;display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--paper2);border-radius:12px 10px 16px 14px;margin-bottom:8px}
+.tarot-card .tt{font-family:'ZCOOL KuaiLe',cursive;font-size:16px;text-align:center}
+.tarot-card .subt{font-size:11px;color:var(--muted);text-align:center;margin-top:2px}
+
+/* ===== back button + day label ===== */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-family:'ZCOOL KuaiLe',cursive;font-size:13px;padding:7px 14px;border-radius:18px 16px 20px 14px;border:2px dashed var(--line);background:var(--paper);color:var(--ink2);cursor:pointer;box-shadow:0 3px 0 var(--line);transition:.12s;width:auto;transform:rotate(-1deg)}
+.back-btn:active{transform:translateY(1px) rotate(0);box-shadow:0 1px 0 var(--line)}
+.day-label{font-size:11px;color:var(--muted);font-family:'ZCOOL KuaiLe',cursive;display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:14px 16px 12px 18px;background:var(--paper2);border:2px dashed var(--line);transform:rotate(1deg)}
+
+/* ===== weekly themes: 7 days ===== */
+/* Mon · 绿野阳台 */
+body[data-dow="1"]{--w1:#dde6d4;--w2:#d2dccd;--w3:#c6c8c0;--f1:#c4ba92;--f2:#bcb488;--cur:#4a7a5a;--cur2:#5a8a6a;--pl:#6b8e5e;--pp:#a67c52;--rug:#8fb8a0;--ls:#e8d07a;--lst:#8b7355;--lb:#8b7355;--fb:#f5efe5;--fbg:#6b8e5e;--paper:#f8f5ec;--paper2:#f2efe4;--line:#c8d4bc;--coral:#5a8a4e;--coral2:#dce8d4;--accent-d:#3a6a2e;--olive:#5a8a4e;--olive2:#dce8d4}
+/* Tue · 暖橙书房 */
+body[data-dow="2"]{--w1:#f0e2cc;--w2:#e8d4b8;--w3:#dcc4a8;--f1:#c8a878;--f2:#bc9c68;--cur:#b8703a;--cur2:#c88050;--pl:#8a9a5e;--pp:#a67c52;--rug:#e0c4a0;--ls:#f0c060;--lst:#8b7355;--lb:#8b7355;--fb:#f5efe5;--fbg:#e8a050;--paper:#faf3ea;--paper2:#f5ece0;--line:#dcc8a8;--coral:#d06840;--coral2:#f9dcc8;--accent-d:#a04820;--honey:#d4a040;--honey2:#faf0d8}
+/* Wed · 薄荷厨房 */
+body[data-dow="3"]{--w1:#dceee8;--w2:#d0e6dc;--w3:#c4dccc;--f1:#c8d8c4;--f2:#bccfb8;--cur:#5a9b8e;--cur2:#6aaba0;--pl:#7a9a6e;--pp:#a68852;--rug:#a0d0c0;--ls:#e8dca0;--lst:#8b8565;--lb:#8b8565;--fb:#f0f0ec;--fbg:#5a9b8e;--paper:#f4f8f6;--paper2:#edf3f0;--line:#b8d4cc;--coral:#5a9b8e;--coral2:#d8eeea;--accent-d:#2a7a6e;--mint:#5a9b8e;--mint2:#d8eeea;--olive:#5a9b8e;--olive2:#d8eeea}
+/* Thu · 壁炉冬夜 */
+body[data-dow="4"]{--w1:#e8dccc;--w2:#dcc8b4;--w3:#d0bca8;--f1:#b8a088;--f2:#ac947c;--cur:#8b3a3a;--cur2:#9b4a4a;--pl:#8a7a5e;--pp:#9a7a52;--rug:#d4a8a0;--ls:#e8a050;--lst:#8b7555;--lb:#8b7555;--fb:#f5e8e0;--fbg:#c46a5a;--paper:#faf4ee;--paper2:#f5ede4;--line:#d4c0ac;--coral:#c46a5a;--coral2:#f5ded8;--accent-d:#9a3a2a;--rose:#c46a5a;--rose2:#f5ded8;--olive:#c46a5a;--olive2:#f5ded8}
+/* Fri · 樱花飘窗 */
+body[data-dow="5"]{--w1:#f5dde4;--w2:#f0d0dc;--w3:#e8c4d0;--f1:#d4c0bc;--f2:#c8b4b0;--cur:#c4788a;--cur2:#d4889a;--pl:#8a8a6e;--pp:#a68a6a;--rug:#e0b8c8;--ls:#f0d0e0;--lst:#9a7a8a;--lb:#9a7a8a;--fb:#f8f0f2;--fbg:#d68a8a;--paper:#fcf4f6;--paper2:#f8f0f2;--line:#d4bcc8;--coral:#d68a8a;--coral2:#f5dede;--accent-d:#a85a5a;--rose:#d68a8a;--rose2:#f5dede;--olive:#d68a8a;--olive2:#f5dede}
+/* Sat · 海边度假 */
+body[data-dow="6"]{--w1:#dceaf2;--w2:#d0e0ec;--w3:#c4d8e4;--f1:#c8d4e0;--f2:#bcc8d4;--cur:#4a7a9b;--cur2:#5a8aab;--pl:#6a8e5e;--pp:#a6a052;--rug:#a0c8e0;--ls:#e8eca0;--lst:#8a8a6a;--lb:#8a8a6a;--fb:#f0f4f8;--fbg:#5a8ab0;--paper:#f4f8fb;--paper2:#edf3f6;--line:#b8cfd8;--coral:#5a8ab0;--coral2:#d8eaf2;--accent-d:#2a6a8a;--sky:#5a8ab0;--sky2:#d8eaf2;--olive:#5a8ab0;--olive2:#d8eaf2}
+/* Sun · 薰衣草午睡 */
+body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb4c8;--cur:#7a5a9a;--cur2:#8a6aaa;--pl:#8a7a6e;--pp:#9a8a6a;--rug:#c0a8d8;--ls:#e0c8f0;--lst:#8a7a9a;--lb:#8a7a9a;--fb:#f4f0f8;--fbg:#8a6ab0;--paper:#faf8fc;--paper2:#f6f2f8;--line:#ccc0d8;--coral:#8a6ab0;--coral2:#e8dcf0;--accent-d:#5a3a7a;--rose:#a88ab0;--rose2:#f0e8f0;--olive:#8a6ab0;--olive2:#e8dcf0}
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="paperFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.12 0" in="noise" result="coloredNoise"/>
+    <feComposite operator="in" in="coloredNoise" in2="SourceGraphic" result="composite"/>
+    <feBlend mode="multiply" in="composite" in2="SourceGraphic"/>
+  </filter>
+</svg>
+
+<div class="room-bg">
+<svg class="scene" viewBox="0 0 400 800" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--w1)"/>
+      <stop offset="60%" stop-color="var(--w2)"/>
+      <stop offset="100%" stop-color="var(--w3)"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--f1)"/>
+      <stop offset="100%" stop-color="var(--f2)"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="rgba(90,78,60,.18)"/>
+    </filter>
+  </defs>
+
+  <!-- wall & floor -->
+  <rect class="base-wall" width="400" height="800"/>
+  <rect class="base-floor" y="620" width="400" height="180"/>
+  <!-- floor planks -->
+  <g stroke="rgba(110,90,70,.08)" stroke-width="2" stroke-linecap="round">
+    <line x1="40" y1="620" x2="20" y2="800"/><line x1="100" y1="620" x2="80" y2="800"/>
+    <line x1="160" y1="620" x2="150" y2="800"/><line x1="220" y1="620" x2="220" y2="800"/>
+    <line x1="280" y1="620" x2="300" y2="800"/><line x1="340" y1="620" x2="370" y2="800"/>
+  </g>
+
+  <!-- curtain -->
+  <path class="curtain" d="M0,0 L400,0 L400,115 Q360,135 320,125 Q280,115 240,128 Q200,140 160,128 Q120,115 80,125 Q40,135 0,115 Z"/>
+  <rect class="curtain-band" x="30" y="118" width="340" height="14" rx="7"/>
+
+  <!-- small round window (cx200 cy170 r33) + themed wall decor -->
+  <!-- outdoor views inside round window -->
+  <g class="scene-group g1">
+    <circle cx="200" cy="170" r="33" fill="#a8d8a0" opacity=".55"/>
+    <path d="M170,188 Q185,166 200,178 Q215,160 230,188" fill="#7aa86a" opacity=".5"/>
+    <circle cx="214" cy="160" r="5" fill="#fff" opacity=".35"/>
+  </g>
+  <g class="scene-group g2">
+    <circle cx="200" cy="170" r="33" fill="#d8e6f0" opacity=".55"/>
+    <ellipse cx="188" cy="162" rx="9" ry="4" fill="#fff" opacity=".5"/>
+    <ellipse cx="214" cy="178" rx="11" ry="4" fill="#fff" opacity=".4"/>
+  </g>
+  <g class="scene-group g3">
+    <circle cx="200" cy="170" r="33" fill="#c8e8d8" opacity=".5"/>
+    <ellipse cx="210" cy="166" rx="7" ry="3" fill="#fff" opacity=".4"/>
+  </g>
+  <g class="scene-group g4">
+    <circle cx="200" cy="170" r="33" fill="#2a3a5a" opacity=".55"/>
+    <circle cx="190" cy="160" r="1.5" fill="#fff" opacity=".8"/>
+    <circle cx="212" cy="164" r="1.5" fill="#fff" opacity=".8"/>
+    <circle cx="200" cy="176" r="1" fill="#fff" opacity=".7"/>
+    <circle cx="220" cy="173" r="1.5" fill="#fff" opacity=".8"/>
+  </g>
+  <g class="scene-group g5">
+    <circle cx="200" cy="170" r="33" fill="#f8dce6" opacity=".55"/>
+    <path d="M174,184 Q187,160 200,174 Q213,156 226,184" fill="none" stroke="#e8a8bf" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="186" cy="166" r="2.5" fill="#f0b8c8"/>
+    <circle cx="214" cy="170" r="3" fill="#f0b8c8"/>
+  </g>
+  <g class="scene-group g6">
+    <circle cx="200" cy="170" r="33" fill="#a8d0e8" opacity=".5"/>
+    <path d="M167,170 L233,170" stroke="#e8d8a0" stroke-width="12" opacity=".4"/>
+    <path d="M178,180 Q188,172 196,180" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+  </g>
+  <g class="scene-group g7">
+    <circle cx="200" cy="170" r="33" fill="#c8b8d8" opacity=".5"/>
+    <path d="M208,160 Q216,150 218,162 Q210,168 208,160" fill="#fff" opacity=".6"/>
+    <circle cx="188" cy="174" r="1.5" fill="#fff" opacity=".5"/>
+  </g>
+
+  <!-- round window frame -->
+  <circle cx="200" cy="170" r="36" fill="none" stroke="rgba(110,90,70,.5)" stroke-width="4"/>
+  <circle cx="200" cy="170" r="33" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+  <line x1="167" y1="170" x2="233" y2="170" stroke="rgba(110,90,70,.3)" stroke-width="2" stroke-linecap="round"/>
+  <!-- window sill (small) -->
+  <rect x="168" y="204" width="64" height="9" rx="4" fill="var(--f1)" opacity=".8"/>
+
+  <!-- themed indoor decorations (bigger, spread across wall) -->
+  <!-- Mon: wall vines (left) + floor plant (right) -->
+  <g class="scene-group g1">
+    <path d="M22,210 Q38,260 28,310 Q42,350 34,400" fill="none" stroke="#7aa86a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="36" cy="235" rx="10" ry="6" fill="#8fbf7a" transform="rotate(-30 36 235)"/>
+    <ellipse cx="26" cy="275" rx="10" ry="6" fill="#8fbf7a" transform="rotate(20 26 275)"/>
+    <ellipse cx="40" cy="320" rx="10" ry="6" fill="#8fbf7a" transform="rotate(-25 40 320)"/>
+    <ellipse cx="30" cy="365" rx="9" ry="5" fill="#8fbf7a" transform="rotate(15 30 365)"/>
+    <ellipse cx="322" cy="560" rx="16" ry="11" fill="#a67c52"/>
+    <path d="M322,544 Q312,510 322,495 Q332,510 322,544" fill="#6b8e5e"/>
+    <path d="M330,548 Q342,520 337,500" fill="none" stroke="#6b8e5e" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Tue: bookshelf (left) + wall painting (right) -->
+  <g class="scene-group g2">
+    <rect x="16" y="280" width="66" height="145" rx="4" fill="#a67c52" opacity=".85"/>
+    <rect x="20" y="288" width="58" height="32" rx="2" fill="#e8c97a" opacity=".75"/>
+    <rect x="20" y="326" width="58" height="32" rx="2" fill="#7db5a8" opacity=".75"/>
+    <rect x="20" y="364" width="58" height="32" rx="2" fill="#d68a8a" opacity=".75"/>
+    <rect x="20" y="402" width="58" height="18" rx="2" fill="#b8a088" opacity=".5"/>
+    <rect x="300" y="295" width="48" height="60" rx="3" fill="#f5efe5" stroke="#d8cfc0" stroke-width="2"/>
+    <circle cx="324" cy="320" r="11" fill="#e8c97a" opacity=".6"/>
+    <path d="M312,335 Q324,325 336,335" fill="none" stroke="#b8a088" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Wed: kitchen cabinet (left) + wall clock (right) -->
+  <g class="scene-group g3">
+    <rect x="14" y="300" width="70" height="115" rx="5" fill="#e0e8dc" stroke="#b8d4cc" stroke-width="2"/>
+    <rect x="18" y="306" width="62" height="50" rx="3" fill="#f0f5ec" stroke="#c8dcd4" stroke-width="1.5"/>
+    <rect x="18" y="362" width="62" height="48" rx="3" fill="#f0f5ec" stroke="#c8dcd4" stroke-width="1.5"/>
+    <circle cx="49" cy="331" r="4" fill="#7db5a8" opacity=".6"/>
+    <circle cx="49" cy="386" r="4" fill="#7db5a8" opacity=".6"/>
+    <circle cx="322" cy="300" r="20" fill="#f5efe5" stroke="#b8d4cc" stroke-width="2.5"/>
+    <circle cx="322" cy="300" r="2" fill="#5a9b8e"/>
+    <line x1="322" y1="300" x2="322" y2="288" stroke="#5a9b8e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="322" y1="300" x2="333" y2="305" stroke="#5a9b8e" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="322" cy="286" r="1.5" fill="#5a9b8e" opacity=".6"/>
+    <circle cx="336" cy="300" r="1.5" fill="#5a9b8e" opacity=".6"/>
+    <circle cx="322" cy="314" r="1.5" fill="#5a9b8e" opacity=".6"/>
+    <circle cx="308" cy="300" r="1.5" fill="#5a9b8e" opacity=".6"/>
+  </g>
+  <!-- Thu: fireplace (center) + framed photo (right) -->
+  <g class="scene-group g4">
+    <rect x="135" y="440" width="130" height="95" rx="5" fill="#b8a088" opacity=".85"/>
+    <path d="M152,452 L152,528 L248,528 L248,452 Q200,436 152,452" fill="#7a5a4a" opacity=".6"/>
+    <path d="M182,522 Q200,478 218,522 Q200,534 182,522" fill="#e8a050"/>
+    <path d="M200,525 Q212,488 220,525" fill="#f5b042"/>
+    <path d="M190,522 Q200,495 208,522" fill="#f5d042" opacity=".7"/>
+    <rect x="125" y="528" width="150" height="14" rx="7" fill="#b8a088"/>
+    <rect x="300" y="295" width="48" height="62" rx="3" fill="#9a7a6a" opacity=".7"/>
+    <rect x="305" y="303" width="38" height="26" rx="2" fill="#e8dccc"/>
+    <rect x="305" y="333" width="38" height="20" rx="2" fill="#d8ccc0"/>
+  </g>
+  <!-- Fri: window seat cushion + scattered petals -->
+  <g class="scene-group g5">
+    <rect x="160" y="210" width="80" height="18" rx="6" fill="#f0c4d0" opacity=".85"/>
+    <rect x="165" y="213" width="70" height="12" rx="4" fill="#f8dce6"/>
+    <circle cx="160" cy="216" r="4" fill="#f0b8c8" opacity=".7"/>
+    <circle cx="240" cy="216" r="4" fill="#f0b8c8" opacity=".7"/>
+    <circle cx="80" cy="480" r="6" fill="#f0b8c8" opacity=".6"/>
+    <circle cx="340" cy="520" r="5" fill="#f0b8c8" opacity=".5"/>
+    <circle cx="50" cy="560" r="7" fill="#f0b8c8" opacity=".55"/>
+    <circle cx="300" cy="470" r="4" fill="#f0b8c8" opacity=".5"/>
+    <path d="M75,475 Q80,470 85,475 Q80,485 75,475" fill="#f0b8c8" opacity=".4"/>
+    <path d="M335,515 Q340,510 345,515 Q340,525 335,515" fill="#f0b8c8" opacity=".4"/>
+  </g>
+  <!-- Sat: beach ball + starfish + shells -->
+  <g class="scene-group g6">
+    <circle cx="322" cy="540" r="26" fill="#f5b042" opacity=".85"/>
+    <path d="M322,514 L322,566 M296,540 L348,540" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+    <path d="M305,523 L339,557 M339,523 L305,557" stroke="#5a8ab0" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+    <path d="M55,565 L63,580 L78,582 L67,593 L70,608 L55,600 L40,608 L43,593 L32,582 L47,580 Z" fill="#e8a050" opacity=".75"/>
+    <circle cx="45" cy="610" r="12" fill="#f5efe5" opacity=".7"/>
+    <ellipse cx="70" cy="615" rx="8" ry="5" fill="#e8d8b8" opacity=".6"/>
+    <circle cx="345" cy="600" r="8" fill="#f5efe5" opacity=".6"/>
+  </g>
+  <!-- Sun: lavender bottle + moon cushion -->
+  <g class="scene-group g7">
+    <rect x="298" y="400" width="28" height="58" rx="5" fill="#c0a8d8" opacity=".75"/>
+    <rect x="304" y="390" width="16" height="12" rx="3" fill="#8a6ab0"/>
+    <circle cx="312" cy="425" r="3" fill="#8a6ab0" opacity=".5"/>
+    <circle cx="320" cy="438" r="3" fill="#8a6ab0" opacity=".5"/>
+    <circle cx="306" cy="445" r="2.5" fill="#8a6ab0" opacity=".4"/>
+    <circle cx="48" cy="580" r="26" fill="#e8e0f0" opacity=".75"/>
+    <path d="M38,580 Q48,562 58,580 Q48,598 38,580" fill="#c0a8d8" opacity=".5"/>
+    <circle cx="44" cy="572" r="3" fill="#d0c0e0" opacity=".5"/>
+  </g>
+
+  <!-- base furniture: plant, lamp, rug, foodbag -->
+  <g filter="url(#softShadow)">
+    <!-- rug -->
+    <ellipse cx="200" cy="700" rx="120" ry="50" class="rug"/>
+    <!-- floor lamp -->
+    <g transform="translate(320, 640)">
+      <ellipse cx="25" cy="105" rx="22" ry="7" class="lamp-stand"/>
+      <rect x="22" y="35" width="6" height="70" rx="3" class="lamp-stand"/>
+      <path d="M0,35 Q25,0 50,35 Q40,42 25,42 Q10,42 0,35" class="lamp-shade"/>
+    </g>
+    <!-- potted plant -->
+    <g transform="translate(300, 180)">
+      <path d="M10,70 Q-5,35 10,15 Q25,35 10,70" class="plant-leaf"/>
+      <path d="M35,70 Q50,30 35,10 Q20,30 35,70" class="plant-leaf"/>
+      <path d="M22,75 Q22,40 35,25 Q30,50 22,75" class="plant-leaf"/>
+      <ellipse cx="22" cy="85" rx="18" ry="12" class="plant-pot"/>
+    </g>
+    <!-- foodbag -->
+    <g transform="translate(25, 640) rotate(-6)">
+      <rect x="0" y="0" width="44" height="56" rx="4" class="foodbag"/>
+      <circle cx="22" cy="22" r="14" class="foodbag-circle"/>
+    </g>
+  </g>
+</svg>
+</div>
+
+<div id="app">
+
+  <!-- ===== 首页 ===== -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <svg class="scene" viewBox="0 0 150 130">
+        <defs>
+          <filter id="wcH" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="0.55"/>
+          </filter>
+        </defs>
+        <g filter="url(#wcH)">
+          <!-- shadow under stack -->
+          <ellipse cx="88" cy="118" rx="55" ry="5" fill="rgba(0,0,0,.06)"/>
+          <!-- stack of buckets (3 layers, slightly tilted) -->
+          <rect x="55" y="82" width="66" height="22" rx="8" fill="#e8c97a" opacity=".85" transform="rotate(2 88 93)"/>
+          <rect x="48" y="58" width="76" height="24" rx="8" fill="#7db5a8" opacity=".85" transform="rotate(-1 86 70)"/>
+          <rect x="58" y="34" width="58" height="24" rx="8" fill="#e07a5f" opacity=".85" transform="rotate(1.5 87 46)"/>
+          <!-- bucket rim shadow -->
+          <ellipse cx="87" cy="34" rx="29" ry="4" fill="#b85a3a" opacity=".5"/>
+          <!-- energetic cat peeking out of bucket -->
+          <!-- body (rounded, mostly hidden) -->
+          <ellipse cx="87" cy="28" rx="18" ry="11" fill="#f5d0a0"/>
+          <!-- body darker patch (calico) -->
+          <ellipse cx="78" cy="26" rx="6" ry="7" fill="#d8a87a" opacity=".7"/>
+          <ellipse cx="95" cy="29" rx="5" ry="5" fill="#c89870" opacity=".55"/>
+          <!-- raised paw waving (energetic!) -->
+          <ellipse cx="62" cy="14" rx="5" ry="7" fill="#f5d0a0" transform="rotate(-25 62 14)"/>
+          <circle cx="59" cy="9" r="3" fill="#f8c0a0"/>
+          <circle cx="61" cy="11" r="2.2" fill="#f5d0a0"/>
+          <circle cx="60" cy="13" r="2.2" fill="#f5d0a0"/>
+          <!-- head (big, round, watercolour) -->
+          <ellipse cx="87" cy="14" rx="14" ry="12" fill="#f5d0a0"/>
+          <!-- head top patches (calico spots) -->
+          <ellipse cx="80" cy="8" rx="5" ry="4" fill="#d8a87a" opacity=".65"/>
+          <ellipse cx="95" cy="11" rx="3.5" ry="3" fill="#c89870" opacity=".6"/>
+          <!-- ears (rounded triangle, upright & alert) -->
+          <path d="M75,9 Q73,-2 79,2 L82,10 Z" fill="#f5d0a0"/>
+          <path d="M99,9 Q101,-2 95,2 L92,10 Z" fill="#f5d0a0"/>
+          <!-- inner ear pink -->
+          <path d="M76,8 Q75,1 78,4 L80,9 Z" fill="#f8b0a0" opacity=".85"/>
+          <path d="M98,8 Q99,1 96,4 L94,9 Z" fill="#f8b0a0" opacity=".85"/>
+          <!-- BIG bright eyes (round, with highlight + small reflection = 湿潤) -->
+          <ellipse cx="82" cy="14" rx="2.2" ry="2.6" fill="#3a2820"/>
+          <ellipse cx="93" cy="14" rx="2.2" ry="2.6" fill="#3a2820"/>
+          <circle cx="82.7" cy="13.2" r="0.7" fill="#fff"/>
+          <circle cx="93.7" cy="13.2" r="0.7" fill="#fff"/>
+          <circle cx="81.3" cy="15" r="0.35" fill="#fff" opacity=".7"/>
+          <circle cx="92.3" cy="15" r="0.35" fill="#fff" opacity=".7"/>
+          <!-- eyebrows (alert, lifted) -->
+          <path d="M78,9 Q82,7 85,9" stroke="#a87850" fill="none" stroke-width="0.6" stroke-linecap="round" opacity=".6"/>
+          <path d="M90,9 Q93,7 97,9" stroke="#a87850" fill="none" stroke-width="0.6" stroke-linecap="round" opacity=".6"/>
+          <!-- nose (small triangle) -->
+          <path d="M86,17 L88,17 L87,18.5 Z" fill="#d06850"/>
+          <!-- mouth (smiling w) -->
+          <path d="M87,18.5 Q86,20 85,19 M87,18.5 Q88,20 89,19" stroke="#5a4030" fill="none" stroke-width="0.6" stroke-linecap="round"/>
+          <!-- cheeks (rosy) -->
+          <ellipse cx="79" cy="17" rx="2.3" ry="1.5" fill="#f5a090" opacity=".55"/>
+          <ellipse cx="96" cy="17" rx="2.3" ry="1.5" fill="#f5a090" opacity=".55"/>
+          <!-- whiskers (2 each side) -->
+          <line x1="76" y1="16" x2="71" y2="15" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+          <line x1="76" y1="18" x2="71" y2="19" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+          <line x1="99" y1="16" x2="104" y2="15" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+          <line x1="99" y1="18" x2="104" y2="19" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+          <!-- tail curling up right (energetic) -->
+          <path d="M104,30 Q118,28 122,18 Q124,12 120,8" stroke="#d8a87a" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M104,30 Q118,28 122,18 Q124,12 120,8" stroke="#f5d0a0" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- sparkle (instead of Zz) — "energetic, growing" -->
+          <g opacity=".85">
+            <path d="M120,2 L122,6 L126,7 L122,8 L120,12 L118,8 L114,7 L118,6 Z" fill="#f5d068"/>
+            <circle cx="40" cy="6" r="1.5" fill="#f5d068"/>
+            <circle cx="32" cy="22" r="1" fill="#f5a090"/>
+            <circle cx="44" cy="40" r="1" fill="#9bc48a"/>
+          </g>
+        </g>
+      </svg>
+      <h1>七星堆肥厂</h1>
+      <p class="sub" id="hero-sub">今天，好好用起来 ✦</p>
+      <div class="slogan">💪 精神增肌中…请勿投喂五花肉 🚫🥩</div>
+      <div style="margin-top:8px"><span class="day-label" id="home-theme"></span></div>
+    </div>
+
+    <div class="card" style="padding:14px 16px">
+      <div class="row between">
+        <div class="sec-head" style="margin:0"><h3>我的连续发酵</h3></div>
+        <span class="badge" id="streak-badge">🔥 0 天</span>
+      </div>
+      <div class="row between" style="margin-top:10px">
+        <div><div class="sm muted">今日脑蛋白</div><div style="font-size:22px;font-family:'ZCOOL KuaiLe',cursive;color:var(--coral)"><span id="stat-like">0</span> <span class="sm" style="font-weight:400">个赞</span></div></div>
+        <div><div class="sm muted">已收藏</div><div style="font-size:22px;font-family:'ZCOOL KuaiLe',cursive;color:#8a6a25"><span id="stat-save">0</span> <span class="sm" style="font-weight:400">颗⭐</span></div></div>
+        <div><div class="sm muted">力训次数</div><div style="font-size:22px;font-family:'ZCOOL KuaiLe',cursive;color:#3a7a6a"><span id="stat-train">0</span> <span class="sm" style="font-weight:400">次</span></div></div>
+      </div>
+    </div>
+
+    <div class="qcards"><div class="qcard" onclick="go('news')">
+        <svg class="scene-ic" viewBox="0 0 70 60" style="filter:blur(.4px)">
+          <ellipse cx="35" cy="36" rx="18" ry="14" fill="#7db5a8" opacity=".45"/>
+          <ellipse cx="27" cy="33" rx="5" ry="4" fill="#5d9588" opacity=".5"/>
+          <ellipse cx="43" cy="34" rx="4" ry="3" fill="#4d8578" opacity=".45"/>
+          <path d="M22,20 Q20,8 27,12 L30,21 Z" fill="#7db5a8"/>
+          <path d="M48,20 Q50,8 43,12 L40,21 Z" fill="#7db5a8"/>
+          <path d="M23,19 Q22,11 26,14 L28,20 Z" fill="#a8d5c8" opacity=".8"/>
+          <path d="M47,19 Q48,11 44,14 L42,20 Z" fill="#a8d5c8" opacity=".8"/>
+          <ellipse cx="35" cy="22" rx="13" ry="11" fill="#a8dcc8"/>
+          <ellipse cx="29" cy="20" rx="3.5" ry="2.8" fill="#5d9588" opacity=".55"/>
+          <path d="M30,16 Q33,15 36,16" stroke="#4a7568" fill="none" stroke-width="0.55" stroke-linecap="round" opacity=".55"/>
+          <path d="M34,16 Q37,15 40,16" stroke="#4a7568" fill="none" stroke-width="0.55" stroke-linecap="round" opacity=".55"/>
+          <ellipse cx="30" cy="22" rx="2" ry="2.4" fill="#fff"/>
+          <ellipse cx="40" cy="22" rx="2" ry="2.4" fill="#fff"/>
+          <ellipse cx="30" cy="22" rx="1.4" ry="1.7" fill="#3a2820"/>
+          <ellipse cx="40" cy="22" rx="1.4" ry="1.7" fill="#3a2820"/>
+          <circle cx="30.4" cy="21.4" r="0.55" fill="#fff"/>
+          <circle cx="40.4" cy="21.4" r="0.55" fill="#fff"/>
+          <path d="M34,26 L36,26 L35,27.5 Z" fill="#d06850"/>
+          <path d="M35,27.5 Q34.2,29 33.4,28 M35,27.5 Q35.8,29 36.6,28" stroke="#5a4030" fill="none" stroke-width="0.5" stroke-linecap="round"/>
+          <ellipse cx="27" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".45"/>
+          <ellipse cx="43" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".45"/>
+          <line x1="24" y1="24" x2="19" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="24" y1="26" x2="19" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="24" x2="51" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="26" x2="51" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+        </svg>
+        <div class="qi">📡</div>
+        <div><div class="qt">提纯 & 堆料</div><div class="qd" id="qc-news">今日必读</div></div>
+      </div>
+      <div class="qcard" onclick="go('mine')">
+        <svg class="scene-ic" viewBox="0 0 70 60" style="filter:blur(.4px)">
+          <ellipse cx="35" cy="36" rx="18" ry="14" fill="#9bbcd3" opacity=".45"/>
+          <ellipse cx="27" cy="33" rx="5" ry="4" fill="#7b9cb3" opacity=".5"/>
+          <ellipse cx="43" cy="34" rx="4" ry="3" fill="#6b8ca3" opacity=".45"/>
+          <path d="M22,20 Q20,8 27,12 L30,21 Z" fill="#9bbcd3"/>
+          <path d="M48,20 Q50,8 43,12 L40,21 Z" fill="#9bbcd3"/>
+          <path d="M23,19 Q22,11 26,14 L28,20 Z" fill="#c0d8e8" opacity=".8"/>
+          <path d="M47,19 Q48,11 44,14 L42,20 Z" fill="#c0d8e8" opacity=".8"/>
+          <ellipse cx="35" cy="22" rx="13" ry="11" fill="#c8e0f0"/>
+          <ellipse cx="29" cy="20" rx="3.5" ry="2.8" fill="#7b9cb3" opacity=".55"/>
+          <path d="M30,16 Q33,15 36,16" stroke="#5b7c93" fill="none" stroke-width="0.55" stroke-linecap="round" opacity=".55"/>
+          <path d="M34,16 Q37,15 40,16" stroke="#5b7c93" fill="none" stroke-width="0.55" stroke-linecap="round" opacity=".55"/>
+          <ellipse cx="30" cy="22" rx="2" ry="2.4" fill="#fff"/>
+          <ellipse cx="40" cy="22" rx="2" ry="2.4" fill="#fff"/>
+          <ellipse cx="30" cy="22" rx="1.4" ry="1.7" fill="#3a2820"/>
+          <ellipse cx="40" cy="22" rx="1.4" ry="1.7" fill="#3a2820"/>
+          <circle cx="30.4" cy="21.4" r="0.55" fill="#fff"/>
+          <circle cx="40.4" cy="21.4" r="0.55" fill="#fff"/>
+          <path d="M34,26 L36,26 L35,27.5 Z" fill="#d06850"/>
+          <path d="M35,27.5 Q34.2,29 33.4,28 M35,27.5 Q35.8,29 36.6,28" stroke="#5a4030" fill="none" stroke-width="0.5" stroke-linecap="round"/>
+          <ellipse cx="27" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".45"/>
+          <ellipse cx="43" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".45"/>
+          <line x1="24" y1="24" x2="19" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="24" y1="26" x2="19" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="24" x2="51" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="26" x2="51" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+        </svg>
+        <div class="qi">📝</div>
+        <div><div class="qt">废料回收口</div><div class="qd" id="qc-mine">复盘 & 灵感箱</div></div>
+      </div>
+    <div class="qcard" onclick="go('train')">
+        <svg class="scene-ic" viewBox="0 0 70 60" style="filter:blur(.4px)">
+          <ellipse cx="35" cy="36" rx="18" ry="14" fill="#e07a5f" opacity=".4"/>
+          <ellipse cx="28" cy="33" rx="6" ry="5" fill="#c85a3a" opacity=".5"/>
+          <path d="M22,20 Q20,8 27,12 L30,21 Z" fill="#e07a5f"/>
+          <path d="M48,20 Q50,8 43,12 L40,21 Z" fill="#e07a5f"/>
+          <path d="M23,19 Q22,11 26,14 L28,20 Z" fill="#f8b0a0" opacity=".8"/>
+          <path d="M47,19 Q48,11 44,14 L42,20 Z" fill="#f8b0a0" opacity=".8"/>
+          <ellipse cx="35" cy="22" rx="13" ry="11" fill="#f5c890"/>
+          <ellipse cx="29" cy="20" rx="4" ry="3" fill="#e07a5f" opacity=".6"/>
+          <ellipse cx="42" cy="22" rx="3" ry="2.5" fill="#c85a3a" opacity=".5"/>
+          <ellipse cx="30" cy="22" rx="2" ry="2.4" fill="#3a2820"/>
+          <ellipse cx="40" cy="22" rx="2" ry="2.4" fill="#3a2820"/>
+          <circle cx="30.6" cy="21.3" r="0.65" fill="#fff"/>
+          <circle cx="40.6" cy="21.3" r="0.65" fill="#fff"/>
+          <path d="M34,26 L36,26 L35,27.5 Z" fill="#d06850"/>
+          <path d="M35,27.5 Q34.2,29 33.4,28 M35,27.5 Q35.8,29 36.6,28" stroke="#5a4030" fill="none" stroke-width="0.5" stroke-linecap="round"/>
+          <ellipse cx="27" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".5"/>
+          <ellipse cx="43" cy="25" rx="2" ry="1.3" fill="#f5a090" opacity=".5"/>
+          <line x1="24" y1="24" x2="19" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="24" y1="26" x2="19" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="24" x2="51" y2="23" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+          <line x1="46" y1="26" x2="51" y2="27" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".6"/>
+        </svg>
+        <div class="qi">💪</div>
+        <div><div class="qt">真·增肌站</div><div class="qd" id="qc-train">点击记录 / 查动作库</div></div>
+      </div>
+      <div class="qcard" onclick="go('stock')">
+        <svg class="scene-ic" viewBox="0 0 70 60" style="filter:blur(.4px)">
+          <circle cx="34" cy="30" r="18" fill="#e8c97a"/>
+          <circle cx="34" cy="30" r="13.5" fill="#f4dd9a"/>
+          <path d="M28,24 q6,-6 12,0" stroke="#a87a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M28,30 h12 M31,30 v9 M37,30 v9" stroke="#a87a3a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M14,48 L28,38 L37,43 L54,28" fill="none" stroke="#6b8e5e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M54,28 l-8,0 l0,8 Z" fill="#6b8e5e"/>
+        </svg>
+        <div class="qi">💰</div>
+        <div><div class="qt">散户进化论</div><div class="qd" id="qc-stock">从小白到不被割</div></div>
+      </div>
+      </div>
+  </section>
+
+  <!-- ===== 力训 ===== -->
+  <section id="view-train" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <h1>💪 真·增肌站</h1>
+    <p class="sub">私教课 / 自练都能记，自动沉淀进个人动作库</p>
+    <div class="chips" style="margin-bottom:12px">
+      <button class="chip active" data-traintab="record" onclick="trainTab('record')">📝 记录</button>
+      <button class="chip" data-traintab="lib" onclick="trainTab('lib')">📚 动作库</button>
+      <button class="chip" data-traintab="plan" onclick="trainTab('plan')">🏋️ 健身房计划</button>
+    </div>
+
+    <div id="panel-record">
+      <div class="card">
+        <svg class="floating-cat" viewBox="0 0 40 40" style="filter:blur(.45px)">
+          <ellipse cx="20" cy="31" rx="13" ry="8" fill="#e07a5f" opacity=".35"/>
+          <path d="M10,12 Q8,4 14,8 L16,14 Z" fill="#e07a5f"/>
+          <path d="M30,12 Q32,4 26,8 L24,14 Z" fill="#e07a5f"/>
+          <path d="M11,11 Q10,6 13,9 L14,12 Z" fill="#f8c0b0" opacity=".8"/>
+          <path d="M29,11 Q30,6 27,9 L26,12 Z" fill="#f8c0b0" opacity=".8"/>
+          <ellipse cx="20" cy="21" rx="11" ry="9.5" fill="#f5c890"/>
+          <ellipse cx="15" cy="17" rx="3.5" ry="2.8" fill="#e07a5f" opacity=".55"/>
+          <ellipse cx="25" cy="18" rx="2.5" ry="2.2" fill="#c85a3a" opacity=".45"/>
+          <ellipse cx="16" cy="20" rx="1.7" ry="2.2" fill="#3a2820"/>
+          <ellipse cx="24" cy="20" rx="1.7" ry="2.2" fill="#3a2820"/>
+          <circle cx="16.5" cy="19.4" r="0.55" fill="#fff"/>
+          <circle cx="24.5" cy="19.4" r="0.55" fill="#fff"/>
+          <path d="M18.5,23 L21.5,23 L20,24.8 Z" fill="#d06850"/>
+          <path d="M20,24.8 Q18.5,26.5 17,26 M20,24.8 Q21.5,26.5 23,26" stroke="#3a2820" fill="none" stroke-width="0.6" stroke-linecap="round"/>
+          <ellipse cx="13" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".5"/>
+          <ellipse cx="27" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".5"/>
+          <line x1="7" y1="22" x2="12" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="7" y1="24.5" x2="12" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="33" y1="22" x2="28" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="33" y1="24.5" x2="28" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+        </svg>
+        <label class="fl">日期</label>
+        <input type="date" id="tr-date">
+        <label class="fl" style="margin-top:12px">训练部位（可选）</label>
+        <select id="tr-part"><option value="">选择部位</option></select>
+        <div class="sep"></div>
+        <div id="builder"></div>
+        <button class="btn ghost sm" style="margin-bottom:10px" onclick="addRow()">+ 添加动作</button>
+        <button class="btn" onclick="saveSession()">💾 保存本次训练</button>
+        <div class="hint">从动作库点"加入今日"会自动添加到这里。输入动作名会显示上次记录参考。</div>
+      </div>
+      <div class="card">
+        <div class="sec-head"><h3>📜 历史记录</h3><span class="badge mint" id="train-streak">连续 0 天</span></div>
+        <div id="history" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="panel-lib" style="display:none">
+      <div class="body-box" id="body-card">
+        <div class="row between"><h3 id="body-title">肌群预览</h3></div>
+        <div id="body-svg-container" style="margin-top:6px"></div>
+      </div>
+      <div class="chips" id="lib-chips" style="margin-bottom:10px"></div>
+      <div id="lib-list"></div>
+    </div>
+
+    <div id="panel-plan" style="display:none">
+      <div class="card">
+        <svg class="floating-cat" viewBox="0 0 40 40" style="filter:blur(.45px)">
+          <ellipse cx="20" cy="31" rx="13" ry="8" fill="#7db5a8" opacity=".35"/>
+          <path d="M10,12 Q8,4 14,8 L16,14 Z" fill="#7db5a8"/>
+          <path d="M30,12 Q32,4 26,8 L24,14 Z" fill="#7db5a8"/>
+          <path d="M11,11 Q10,6 13,9 L14,12 Z" fill="#a8d5c8" opacity=".8"/>
+          <path d="M29,11 Q30,6 27,9 L26,12 Z" fill="#a8d5c8" opacity=".8"/>
+          <ellipse cx="20" cy="21" rx="11" ry="9.5" fill="#a8dcc8"/>
+          <ellipse cx="15" cy="17" rx="3.5" ry="2.8" fill="#5d9588" opacity=".55"/>
+          <ellipse cx="25" cy="18" rx="2.5" ry="2.2" fill="#4d8578" opacity=".45"/>
+          <ellipse cx="16" cy="20" rx="1.7" ry="2.2" fill="#fff"/>
+          <ellipse cx="24" cy="20" rx="1.7" ry="2.2" fill="#fff"/>
+          <ellipse cx="16" cy="20" rx="1.2" ry="1.6" fill="#3a2820"/>
+          <ellipse cx="24" cy="20" rx="1.2" ry="1.6" fill="#3a2820"/>
+          <circle cx="16.4" cy="19.5" r="0.45" fill="#fff"/>
+          <circle cx="24.4" cy="19.5" r="0.45" fill="#fff"/>
+          <path d="M18.5,23 L21.5,23 L20,24.8 Z" fill="#d06850"/>
+          <path d="M20,24.8 Q18.5,26.5 17,26 M20,24.8 Q21.5,26.5 23,26" stroke="#3a2820" fill="none" stroke-width="0.6" stroke-linecap="round"/>
+          <ellipse cx="13" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".45"/>
+          <ellipse cx="27" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".45"/>
+          <line x1="7" y1="22" x2="12" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="7" y1="24.5" x2="12" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="33" y1="22" x2="28" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+          <line x1="33" y1="24.5" x2="28" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+        </svg>
+        <label class="fl">今天自己去健身房，想练哪个部位？</label>
+        <select id="plan-focus" onchange="genPlan()"></select>
+        <div id="plan-out" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 散户进化论（股市入门） ===== -->
+  <section id="view-stock" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <h1>💰 散户进化论</h1>
+    <p class="sub">从被割到学会跑 · 股市小白入门长文</p>
+    <div id="stock-progress" style="margin-bottom:10px"></div>
+    <div id="stock-list"></div>
+    <div id="stock-next" style="margin-top:10px"></div>
+  </section>
+  <section id="view-stock-detail" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('stock')">← 返回</button><span class="day-label"></span></div>
+    <div id="stock-detail"></div>
+  </section>
+
+  <!-- ===== 资讯 ===== -->
+  <section id="view-news" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <h1>📡 提纯 & 堆料</h1>
+    <p class="sub">每日精读 · 每周宠物行业情报 · 散户进化论</p>
+    <div class="card">
+      <div class="sec-head"><h3>我的沉淀</h3><span class="badge" id="fav-total">⭐ 0 · 👍 0</span></div>
+      <div class="chips" style="margin:8px 0 10px">
+        <button class="chip active" data-savtab="saved" onclick="switchSavedTab('saved')">⭐ 收藏 <span id="saved-cnt">0</span></button>
+        <button class="chip" data-savtab="liked" onclick="switchSavedTab('liked')">👍 点赞 <span id="liked-cnt">0</span></button>
+      </div>
+      <div id="saved-list"></div>
+      <div id="liked-list" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="row between"><h3>📡 脑蛋白提纯车间</h3><span class="tag">每日</span></div>
+      <div class="sm muted" style="margin:4px 0 10px">AI · 产品经理 · 电商 · 海外独立站 · 产品sense</div>
+      <div id="news-list"></div>
+      <div class="hint">每天早上 8:00 自动检索更新，次日打开就是当天新鲜脑蛋白。</div>
+    </div>
+    <div class="card">
+      <div class="row between"><h3>🐾 爆款堆料场</h3><span class="tag gold">每周两次</span></div>
+      <div class="sm muted" style="margin:4px 0 10px">老年犬关节 · 猫咪泌尿 · 老年猫犬护理 · 兽医科普 · 测评种草</div>
+      <div id="pet-list"></div>
+      <div class="hint">每周一、周四自动检索更新。不限于固定博主，符合方向的新鲜内容都会捞。</div>
+    </div>
+  </section>
+
+  <!-- ===== 我的 ===== -->
+  <section id="view-mine" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <h1>📝 废料回收口</h1>
+    <p class="sub">每天2分钟，把零散的进步沉淀下来</p>
+    <div class="card">
+      <svg class="floating-cat" viewBox="0 0 40 40" style="filter:blur(.45px)">
+        <ellipse cx="20" cy="31" rx="13" ry="8" fill="#9bbcd3" opacity=".35"/>
+        <path d="M10,12 Q8,4 14,8 L16,14 Z" fill="#9bbcd3"/>
+        <path d="M30,12 Q32,4 26,8 L24,14 Z" fill="#9bbcd3"/>
+        <path d="M11,11 Q10,6 13,9 L14,12 Z" fill="#c0d8e8" opacity=".8"/>
+        <path d="M29,11 Q30,6 27,9 L26,12 Z" fill="#c0d8e8" opacity=".8"/>
+        <ellipse cx="20" cy="21" rx="11" ry="9.5" fill="#c8e0f0"/>
+        <ellipse cx="15" cy="17" rx="3.5" ry="2.8" fill="#7b9cb3" opacity=".55"/>
+        <ellipse cx="25" cy="18" rx="2.5" ry="2.2" fill="#6b8ca3" opacity=".45"/>
+        <ellipse cx="16" cy="20" rx="1.7" ry="2.2" fill="#fff"/>
+        <ellipse cx="24" cy="20" rx="1.7" ry="2.2" fill="#fff"/>
+        <ellipse cx="16" cy="20" rx="1.2" ry="1.6" fill="#3a2820"/>
+        <ellipse cx="24" cy="20" rx="1.2" ry="1.6" fill="#3a2820"/>
+        <circle cx="16.4" cy="19.5" r="0.45" fill="#fff"/>
+        <circle cx="24.4" cy="19.5" r="0.45" fill="#fff"/>
+        <path d="M18.5,23 L21.5,23 L20,24.8 Z" fill="#d06850"/>
+        <path d="M20,24.8 Q18.5,26.5 17,26 M20,24.8 Q21.5,26.5 23,26" stroke="#3a2820" fill="none" stroke-width="0.6" stroke-linecap="round"/>
+        <ellipse cx="13" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".45"/>
+        <ellipse cx="27" cy="23" rx="1.5" ry="1" fill="#f5a090" opacity=".45"/>
+        <line x1="7" y1="22" x2="12" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+        <line x1="7" y1="24.5" x2="12" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+        <line x1="33" y1="22" x2="28" y2="22.5" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+        <line x1="33" y1="24.5" x2="28" y2="24" stroke="#5a3a2a" stroke-width="0.35" stroke-linecap="round" opacity=".55"/>
+      </svg>
+      <div class="sec-head"><h3>每日复盘 3 问</h3><span class="badge" id="rf-today">今日未记</span></div>
+      <label class="fl" style="margin-top:8px">✅ 今天做对了什么？</label>
+      <textarea id="rf-1" placeholder="哪怕一件小事"></textarea>
+      <label class="fl" style="margin-top:10px">🔍 哪里能更好？</label>
+      <textarea id="rf-2" placeholder="明天想调整的点"></textarea>
+      <label class="fl" style="margin-top:10px">🎯 明天的重点？</label>
+      <textarea id="rf-3" placeholder="最重要的一件事"></textarea>
+      <button class="btn" style="margin-top:12px" onclick="saveReflection()">💾 保存今日复盘</button>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h3>📜 历史复盘</h3></div>
+      <div id="rf-history" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h3>💡 灵感收集箱</h3><span class="badge sky">🐾 先存不丢</span></div>
+      <div class="row" style="gap:8px;margin-top:8px">
+        <input id="idea-in" placeholder="点子 / 链接 都可以丢进来…" onkeydown="if(event.key==='Enter')addIdea()">
+        <button class="btn sm" style="width:auto" onclick="addIdea()">+</button>
+      </div>
+      <div class="hint" style="margin-top:10px">丢链接进来会先存着，后续瓦力帮你解析成结构化卡片。</div>
+      <div id="idea-list" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="sec-head"><h3>⚙️ 关于</h3></div>
+      <p class="sm muted">七星堆肥厂 v4 · 💪 精神增肌中，请勿投喂五花肉 🚫🥩<br>本地存储，数据在你的设备上。</p>
+      <div style="margin-top:10px">
+        <div class="sm muted" style="margin-bottom:6px">🎨 主题预览（点击切换看7套配色，刷新恢复当天）</div>
+        <div class="chips" id="theme-chips"></div>
+      </div>
+      <button class="btn ghost sm" style="margin-top:10px;width:auto" onclick="exportData()">⬇️ 导出我的数据</button>
+    </div>
+  </section>
+
+  <!-- 底部导航 -->
+  <nav class="bottomnav">
+    <button data-nav="news" onclick="go('news')"><span class="ic">📡</span>资讯</button>
+    <button data-nav="train" onclick="go('train')"><span class="ic">💪</span>力训</button>
+    <button data-nav="stock" onclick="go('stock')"><span class="ic">💰</span>散户进化论</button>
+    <button data-nav="mine" onclick="go('mine')"><span class="ic">📝</span>我的</button>
+  </nav>
+</div>
+
+<script>
+/* ===== 基础 ===== */
+const $=s=>document.querySelector(s);
+const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const lsSet=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const dayIndex=()=>Math.floor(Date.now()/86400000);
+// 治愈系小猫咪：圆润三角耳+内耳粉+大眼高光+腮红+胡须+三角鼻+小嘴
+const catNap=`<svg class="cat-illu" viewBox="0 0 80 64" style="width:68px;height:54px">
+  <ellipse cx="40" cy="58" rx="28" ry="3" fill="rgba(0,0,0,.06)"/>
+  <ellipse cx="40" cy="50" rx="28" ry="9" fill="#f5efe5"/>
+  <path d="M22,50 Q10,48 8,38 Q10,30 18,32" stroke="#f5efe5" fill="none" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="50" cy="40" rx="13" ry="11" fill="#f5efe5"/>
+  <path d="M39,33 Q37,23 43,27 L45,34 Z" fill="#f5efe5"/>
+  <path d="M60,33 Q62,23 56,27 L54,34 Z" fill="#f5efe5"/>
+  <path d="M40,32 Q39,26 42,28 L44,33 Z" fill="#f8c0b0"/>
+  <path d="M59,32 Q60,26 57,28 L55,33 Z" fill="#f8c0b0"/>
+  <path d="M44,40 Q47,43 50,40" stroke="#5a4838" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M53,40 Q56,43 59,40" stroke="#5a4838" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M48,43 L52,43 L50,45 Z" fill="#d06850"/>
+  <path d="M50,45 Q49,47 48,46 M50,45 Q51,47 52,46" stroke="#5a4838" fill="none" stroke-width="0.7" stroke-linecap="round"/>
+  <circle cx="43" cy="44" r="1.8" fill="#f8b0a0" opacity=".5"/>
+  <circle cx="57" cy="44" r="1.8" fill="#f8b0a0" opacity=".5"/>
+  <line x1="38" y1="43" x2="33" y2="42" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+  <line x1="38" y1="45" x2="33" y2="45" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+  <line x1="62" y1="43" x2="67" y2="42" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+  <line x1="62" y1="45" x2="67" y2="45" stroke="#8a7a68" stroke-width="0.4" stroke-linecap="round" opacity=".7"/>
+  <text x="64" y="18" font-size="12" fill="#7a9a6e" font-family="ZCOOL KuaiLe" font-weight="bold">Z</text>
+  <text x="70" y="11" font-size="9" fill="#7a9a6e" font-family="ZCOOL KuaiLe">z</text>
+</svg>`;
+const miniCat=(fill,stroke='#3a2820')=>{
+  const inner=fill==='#e07a5f'?'#f8c0b0':(fill==='#7db5a8'?'#a8d5c8':'#c0d8e8');
+  const dark=fill==='#e07a5f'?'#c85a3a':(fill==='#7db5a8'?'#5d9588':'#7b9cb3');
+  return `<svg viewBox="0 0 40 40" style="width:40px;height:40px;filter:blur(.45px)">
+  <ellipse cx="20" cy="31" rx="12" ry="7" fill="${fill}" opacity=".3"/>
+  <path d="M10,12 Q8,4 14,8 L16,14 Z" fill="${fill}"/>
+  <path d="M30,12 Q32,4 26,8 L24,14 Z" fill="${fill}"/>
+  <path d="M11,11 Q10,6 13,9 L14,12 Z" fill="${inner}" opacity=".8"/>
+  <path d="M29,11 Q30,6 27,9 L26,12 Z" fill="${inner}" opacity=".8"/>
+  <ellipse cx="20" cy="21" rx="10" ry="9" fill="${fill}"/>
+  <ellipse cx="15" cy="17.5" rx="3" ry="2.5" fill="${dark}" opacity=".55"/>
+  <ellipse cx="25" cy="18.5" rx="2.2" ry="2" fill="${dark}" opacity=".45"/>
+  <ellipse cx="16" cy="20" rx="1.6" ry="2" fill="${stroke}"/>
+  <ellipse cx="24" cy="20" rx="1.6" ry="2" fill="${stroke}"/>
+  <circle cx="16.5" cy="19.4" r="0.55" fill="#fff"/>
+  <circle cx="24.5" cy="19.4" r="0.55" fill="#fff"/>
+  <circle cx="15.5" cy="20.8" r="0.3" fill="#fff" opacity=".65"/>
+  <circle cx="23.5" cy="20.8" r="0.3" fill="#fff" opacity=".65"/>
+  <path d="M18.5,23 L21.5,23 L20,24.8 Z" fill="#d06850"/>
+  <path d="M20,24.8 Q18.5,26.5 17,26 M20,24.8 Q21.5,26.5 23,26" stroke="${stroke}" fill="none" stroke-width="0.6" stroke-linecap="round"/>
+  <ellipse cx="13.5" cy="23.5" rx="1.3" ry="0.9" fill="#f5a090" opacity=".5"/>
+  <ellipse cx="26.5" cy="23.5" rx="1.3" ry="0.9" fill="#f5a090" opacity=".5"/>
+  <line x1="8" y1="22.5" x2="12" y2="23" stroke="#8a7a68" stroke-width="0.35" stroke-linecap="round" opacity=".6"/>
+  <line x1="8" y1="24.5" x2="12" y2="24" stroke="#8a7a68" stroke-width="0.35" stroke-linecap="round" opacity=".6"/>
+  <line x1="32" y1="22.5" x2="28" y2="23" stroke="#8a7a68" stroke-width="0.35" stroke-linecap="round" opacity=".6"/>
+  <line x1="32" y1="24.5" x2="28" y2="24" stroke="#8a7a68" stroke-width="0.35" stroke-linecap="round" opacity=".6"/>
+</svg>`;};
+
+/* ===== 视图切换 ===== */
+function go(v){
+  document.querySelectorAll('.view').forEach(e=>e.classList.toggle('active',e.id==='view-'+v));
+  document.querySelectorAll('.bottomnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===v));
+  window.scrollTo(0,0);
+  if(v==='stock')loadStockFeed();
+  if(v==='news')loadFeed();
+  if(v==='mine')loadReflection();
+}
+
+/* ===== 数据：动作库 ===== */
+const EX={
+ '胸':[
+  {n:'杠铃卧推',t:'复合',g:'胸大肌/三头/前束',p:'肩胛后缩下沉,杠铃下放至胸下沿,腿驱动',s:'4×6-8'},
+  {n:'上斜哑铃卧推',t:'复合',g:'上胸大肌',p:'30-45度斜凳,哑铃向两侧下放,肘略低于肩',s:'4×8-10'},
+  {n:'蝴蝶机夹胸',t:'孤立',g:'胸大肌内侧',p:'收腹挺胸,想象抱树,顶峰收缩1秒',s:'4×12-15'},
+  {n:'双杠臂屈伸',t:'复合',g:'下胸/三头',p:'身体微前倾练胸,下放至肩平,别太深',s:'3×8-12'},
+  {n:'俯卧撑',t:'自重',g:'胸/三头/核心',p:'身体一条线,肘约45度,下放至胸近地',s:'4×15-20'}
+ ],
+ '背':[
+  {n:'引体向上',t:'复合',g:'背阔肌/二头',p:'肩胛先下沉,肘往下带,别纯靠二头',s:'4×6-10'},
+  {n:'高位下拉',t:'复合',g:'背阔肌',p:'挺胸微后仰,肘往后下方带,顶峰收1秒',s:'4×10-12'},
+  {n:'杠铃划船',t:'复合',g:'背阔/中背',p:'屈髋70度背平直,杠铃贴腿拉至肚脐',s:'4×8-10'},
+  {n:'坐姿绳索划船',t:'复合',g:'中背/背阔',p:'挺胸,肘靠身体,别前后晃',s:'4×10-12'},
+  {n:'面拉',t:'孤立',g:'后束/斜方中下',p:'拉至面部,肘外旋,后束发力',s:'4×15-20'}
+ ],
+ '肩':[
+  {n:'哑铃推举',t:'复合',g:'前/中束/三头',p:'坐稳收腹,哑铃在耳侧,不锁死肘',s:'4×8-10'},
+  {n:'侧平举',t:'孤立',g:'中束',p:'微屈肘,肘带手,顶到肩平,别耸肩',s:'4×12-15'},
+  {n:'前平举',t:'孤立',g:'前束',p:'肘微屈,控制下放,别借力甩',s:'3×12-15'},
+  {n:'俯身飞鸟',t:'孤立',g:'后束',p:'屈髋背平,肘微屈外展,想象抱柱',s:'4×12-15'},
+  {n:'阿诺德推举',t:'复合',g:'前/中束',p:'起始掌心向己,推时外旋,全程控',s:'4×8-10'}
+ ],
+ '二头':[
+  {n:'杠铃弯举',t:'复合',g:'肱二头肌',p:'肘贴身,别前后晃,下放控3秒',s:'4×8-10'},
+  {n:'哑铃交替弯举',t:'孤立',g:'肱二头肌',p:'外旋手腕,顶峰收1秒,对称做',s:'4×10-12'},
+  {n:'锤式弯举',t:'孤立',g:'肱肌/肱桡肌',p:'中性握,肘不动,像锤子敲',s:'4×10-12'},
+  {n:'牧师椅弯举',t:'孤立',g:'二头长头',p:'腋窝卡垫,全程贴椅,别伸肘借力',s:'3×10-12'}
+ ],
+ '三头':[
+  {n:'绳索下压',t:'孤立',g:'肱三头肌',p:'肘夹紧,只小臂动,顶点分开绳索',s:'4×12-15'},
+  {n:'窄距卧推',t:'复合',g:'三头/胸',p:'握距略宽于肩,肘贴身,下放至胸',s:'4×8-10'},
+  {n:'仰卧臂屈伸',t:'孤立',g:'三头长头',p:'肘垂直上举,只小臂下放,别展肘',s:'3×10-12'},
+  {n:'过头臂屈伸',t:'孤立',g:'三头长头',p:'哑铃过头,肘不动,下放至颈后',s:'3×10-12'}
+ ],
+ '腿':[
+  {n:'杠铃深蹲',t:'复合',g:'股四/臀/核心',p:'脚与肩宽,膝跟脚尖,蹲至大腿平',s:'4×6-8'},
+  {n:'罗马尼亚硬拉',t:'复合',g:'腘绳/臀',p:'屈髋为主背平,杠铃贴腿下放至小腿中',s:'4×8-10'},
+  {n:'腿举',t:'复合',g:'股四头肌',p:'脚与肩宽,别锁死膝,下放至90度',s:'4×10-12'},
+  {n:'箭步蹲',t:'复合',g:'股四/臀',p:'步幅适中,前膝不超脚尖,后腿直下',s:'3×10-12'},
+  {n:'腿弯举',t:'孤立',g:'腘绳肌',p:'只小腿动,顶峰收1秒,慢放',s:'4×12-15'},
+  {n:'小腿提踵',t:'孤立',g:'小腿三头肌',p:'站垫边,全程拉伸,顶峰收1秒',s:'4×15-20'}
+ ],
+ '核心':[
+  {n:'平板支撑',t:'自重',g:'核心稳定',p:'身体一条线,收腹,别塌腰翘臀',s:'4×30-60秒'},
+  {n:'卷腹',t:'自重',g:'腹直肌上部',p:'下腰贴地,只肩胛离地,别拽颈',s:'4×15-20'},
+  {n:'悬垂举腿',t:'自重',g:'下腹/髂腰肌',p:'控制不晃,腿抬至水平以上,慢放',s:'3×10-15'},
+  {n:'俄罗斯转体',t:'自重',g:'腹斜肌',p:'屈膝抬脚,转体触地,控速',s:'4×20'},
+  {n:'死虫式',t:'自重',g:'核心稳定',p:'对侧手脚伸,腰贴地,呼气发力',s:'3×10'}
+ ]
+};
+const PARTS=Object.keys(EX);
+
+/* ===== 肌群可视化 SVG 柔和手绘版 ===== */
+function bodySVG(hi){
+  const outline=`<g fill="none" stroke="#c4b5a3" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="50" cy="14" r="10"/>
+    <path d="M46,24 Q46,28 44,30 L56,30 Q54,28 54,24"/>
+    <path d="M34,32 Q26,37 24,48 L22,78 Q22,84 28,86 L72,86 Q78,84 78,78 L76,48 Q74,37 66,32 Z"/>
+    <path d="M26,40 L16,68 L14,94"/>
+    <path d="M74,40 L84,68 L86,94"/>
+    <path d="M42,86 L40,124 L38,154"/>
+    <path d="M58,86 L60,124 L62,154"/>
+  </g>`;
+  const F={
+    '胸':'<ellipse cx="50" cy="44" rx="13" ry="9"/>',
+    '肩':'<circle cx="32" cy="34" r="6"/><circle cx="68" cy="34" r="6"/>',
+    '二头':'<ellipse cx="18" cy="54" rx="5" ry="12" transform="rotate(10 18 54)"/><ellipse cx="82" cy="54" rx="5" ry="12" transform="rotate(-10 82 54)"/>',
+    '核心':'<ellipse cx="50" cy="62" rx="10" ry="15"/>',
+    '腿':'<rect x="37" y="88" width="9" height="64" rx="5"/><rect x="54" y="88" width="9" height="64" rx="5"/>'
+  };
+  const B={
+    '背':'<ellipse cx="50" cy="54" rx="14" ry="22"/>',
+    '三头':'<ellipse cx="18" cy="54" rx="5" ry="12" transform="rotate(10 18 54)"/><ellipse cx="82" cy="54" rx="5" ry="12" transform="rotate(-10 82 54)"/>',
+    '腿':'<rect x="37" y="88" width="9" height="64" rx="5"/><rect x="54" y="88" width="9" height="64" rx="5"/>'
+  };
+  const hlStyle='fill="rgba(224,122,95,0.72)" stroke="#c05e45" stroke-width="2"';
+  const wrap=(body,label)=>`<div class="bv"><svg viewBox="0 0 100 170" style="width:88px;height:150px">${outline}${body?`<g ${hlStyle}>${body}</g>`:''}</svg><div class="lbl">${label}</div></div>`;
+  return `<div class="body-svg">${wrap(F[hi]||'','正面')}${wrap(B[hi]||'','背面')}</div>`;
+}
+
+/* ===== 散户进化论（股市入门）样本（fallback，数据未加载时用） ===== */
+const STOCK_SAMPLE=[
+ {batch:1,cat:'概念入门',t:'股票是什么（示例）',s:'公司所有权凭证，买一股就是小老板',tag:'概念入门',body:'这是示例内容。正常联网后会加载 20 篇带批次的长文科普（混合原创与经典书章节思路）。'},
+ {batch:1,cat:'技术面基础',t:'K线怎么看（示例）',s:'阳线阴线、实体影线',tag:'K线',body:'这是示例内容。'},
+ {batch:2,cat:'基本面入门',t:'财报三张表（示例）',s:'利润表/资产负债表/现金流',tag:'财报',body:'这是示例内容。'}
+];
+
+/* 资讯样本 */
+const NEWS=[
+ {cat:'AI',items:[{t:'(样本)大模型多模态能力再升级',s:'自动化接入后将替换为当日真实抓取',link:'#'}]},
+ {cat:'产品经理',items:[{t:'(样本)某产品增长拆解案例',s:'待自动化接入',link:'#'}]},
+ {cat:'电商',items:[{t:'(样本)某平台大促策略观察',s:'待自动化接入',link:'#'}]},
+ {cat:'海外独立站',items:[{t:'(样本)某DTC品牌增长案例',s:'待自动化接入',link:'#'}]},
+ {cat:'产品sense',items:[{t:'(样本)某产品体验洞察',s:'待自动化接入',link:'#'}]}
+];
+const PET=[
+ {t:'(样本)老年犬关节保养近期热度上升',s:'待每周自动化更新',tag:'趋势',link:'#'},
+ {t:'(样本)某兽医科普老年猫护理注意事项',s:'待每周自动化更新',tag:'二创素材',link:'#'}
+];
+
+/* ===== 力训 ===== */
+let sessions=ls('qx_sessions',[]);
+let builder=[];
+
+function getLastRecord(exName){
+  for(const s of sessions){
+    const ex=s.exs.find(e=>e.n===exName);
+    if(ex)return ex;
+  }
+  return null;
+}
+function initTrain(){
+ $('#tr-date').value=today();
+ const ps=$('#tr-part');PARTS.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o)});
+ const chips=$('#lib-chips');PARTS.forEach((p,i)=>{const b=document.createElement('button');b.className='chip'+(i===0?' active':'');b.textContent=p;b.onclick=()=>{chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');renderLib(p)};chips.appendChild(b)});
+ const sel=$('#plan-focus');['胸','背','肩','二头','三头','腿','核心','全身(推)','全身(拉)','全身(腿)'].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
+ renderLib(PARTS[0]);
+ renderHistory();
+ if(builder.length===0)addRow();
+ updateTrainStreak();
+}
+function trainTab(t){
+ document.querySelectorAll('[data-traintab]').forEach(b=>b.classList.toggle('active',b.dataset.traintab===t));
+ $('#panel-record').style.display=t==='record'?'block':'none';
+ $('#panel-lib').style.display=t==='lib'?'block':'none';
+ $('#panel-plan').style.display=t==='plan'?'block':'none';
+ if(t==='plan'&&$('#plan-out').innerHTML==='')genPlan();
+}
+function addRow(n=''){
+ builder.push({n,sets:'',reps:'',wt:'',rpe:''});
+ renderBuilder();
+}
+function renderBuilder(){
+ const exNames=[].concat(...PARTS.map(p=>EX[p].map(e=>e.n)),ls('qx_customEx',[]).map(e=>e.n));
+ let dl='<datalist id="ex-dl">'+exNames.map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist>';
+ $('#builder').innerHTML=dl+builder.map((r,i)=>`
+  <div class="ex-row">
+   <input list="ex-dl" placeholder="动作名" value="${esc(r.n)}" oninput="builder[${i}].n=this.value;updateLastRec(${i})" style="flex:2">
+   <input class="mini" placeholder="组数" type="number" inputmode="numeric" value="${esc(r.sets)}" oninput="builder[${i}].sets=this.value">
+   <input class="mini" placeholder="次/秒" value="${esc(r.reps)}" oninput="builder[${i}].reps=this.value">
+   <input class="mini" placeholder="kg" value="${esc(r.wt)}" oninput="builder[${i}].wt=this.value">
+   <input class="mini" placeholder="RPE" type="number" inputmode="numeric" min="1" max="10" value="${esc(r.rpe)}" oninput="builder[${i}].rpe=this.value">
+   <button class="del" onclick="builder.splice(${i},1);renderBuilder()">×</button>
+  </div>${r.n?(()=>{const lr=getLastRecord(r.n);return lr?`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}</div>`:''})():''}`).join('');
+}
+function updateLastRec(i){
+  const el=$('#lr-'+i);
+  const lr=getLastRecord(builder[i].n);
+  if(lr){
+    if(el){el.textContent=`上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}`}
+    else{$('#builder').children[i]&&($('#builder').children[i].insertAdjacentHTML('afterend',`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}</div>`))}
+  }else if(el){el.remove()}
+}
+function saveSession(){
+ const exs=builder.filter(r=>r.n.trim());
+ if(!exs.length){alert('先添加至少一个动作');return}
+ const s={date:$('#tr-date').value||today(),part:$('#tr-part').value,exs};
+ sessions.unshift(s);lsSet('qx_sessions',sessions);
+ builder=[];addRow();$('#tr-part').value='';
+ renderHistory();updateHome();updateTrainStreak();
+ confetti(['💪','🔥','✨','🏋️']);
+ alert('✅ 已保存 '+exs.length+' 个动作');
+}
+function renderHistory(){
+ const el=$('#history');
+ if(!sessions.length){el.innerHTML=`<div class="empty">${catNap}还没有记录，私教课或自练后来记一笔</div>`;return}
+ el.innerHTML=sessions.map((s,i)=>`
+  <div class="rf-item">
+   <div class="row between">
+    <div><b>${esc(s.date)}</b> ${s.part?'<span class="tag">'+esc(s.part)+'</span>':''} <span class="sm muted">${s.exs.length}个动作</span></div>
+    <div><button class="btn sm ghost" style="padding:5px 12px" onclick="loadToBuilder(${i})">载入</button> <button class="btn sm" style="padding:5px 12px;background:var(--rose2);color:#a85a5a;box-shadow:0 2px 0 #dcc0c0" onclick="delSession(${i})">删</button></div>
+   </div>
+   <table class="ex-table"><tr><th>动作</th><th>组</th><th>次/秒</th><th>kg</th><th>RPE</th></tr>
+   ${s.exs.map(e=>`<tr><td>${esc(e.n)}</td><td>${esc(e.sets)}</td><td>${esc(e.reps)}</td><td>${esc(e.wt)}</td><td>${esc(e.rpe)}</td></tr>`).join('')}
+   </table>
+  </div>`).join('');
+}
+function loadToBuilder(i){builder=sessions[i].exs.map(e=>({...e}));$('#tr-date').value=sessions[i].date;$('#tr-part').value=sessions[i].part;trainTab('record');renderBuilder();window.scrollTo(0,0)}
+function delSession(i){if(!confirm('删除这条记录？'))return;sessions.splice(i,1);lsSet('qx_sessions',sessions);renderHistory();updateHome();updateTrainStreak()}
+function renderLib(part){
+ $('#body-title').textContent=part+' · 肌群预览';
+ $('#body-svg-container').innerHTML=bodySVG(part);
+ const list=EX[part];
+ $('#lib-list').innerHTML=list.map(e=>`
+  <div class="art-card">
+   ${miniCat('#e07a5f','#fff')}
+   <div class="row between"><div class="art-title">${esc(e.n)}</div><span class="tag">${esc(e.t)}</span></div>
+   <div class="sm muted" style="margin-top:4px">🎯 ${esc(e.g)}</div>
+   <div class="sm" style="margin-top:4px;color:var(--ink2)">💡 ${esc(e.p)}</div>
+   <div class="sm muted" style="margin-top:4px">📊 建议:${esc(e.s)}</div>
+   <button class="btn ghost sm" style="margin-top:10px;width:auto" onclick="addToBuilder('${esc(e.n)}','${esc(part)}')">+ 加入今日训练</button>
+  </div>`).join('');
+}
+function addToBuilder(n,part){
+ if($('#tr-date').value==='')$('#tr-date').value=today();
+ if($('#tr-part').value==='')$('#tr-part').value=part;
+ builder.push({n,sets:'',reps:'',wt:'',rpe:''});renderBuilder();
+ trainTab('record');
+}
+function genPlan(){
+ const f=$('#plan-focus').value;let picks=[];
+ if(f.startsWith('全身')){
+  if(f.includes('推'))picks=[...EX['胸'].slice(0,2),EX['肩'][0],EX['三头'][0]];
+  else if(f.includes('拉'))picks=[...EX['背'].slice(0,2),EX['二头'][0],EX['背'][4]];
+  else if(f.includes('腿'))picks=[...EX['腿'].slice(0,3),EX['核心'][0]];
+  else picks=[EX['胸'][0],EX['背'][0],EX['肩'][0],EX['腿'][0],EX['核心'][0]];
+ }else if(EX[f]){picks=EX[f].slice(0,5)}
+ const k='qx_plan_'+today();let done=ls(k,[]);
+ $('#plan-out').innerHTML=picks.length?`
+  <div class="sm muted">✅ 勾选完成，进度自动保存</div>
+  ${picks.map((e,i)=>`<div class="plan-item"><div class="check ${done.includes(i)?'on':''}" onclick="togglePlan(${i})">${done.includes(i)?'✓':''}</div><div><b>${esc(e.n)}</b><div class="sm muted">${esc(e.g)} · ${esc(e.s)}</div></div></div>`).join('')}
+  <button class="btn ghost sm" style="margin-top:8px;width:auto" onclick="loadPlanToBuilder()">把这组载入今日记录</button>`:`<div class="empty">${catNap}选一个部位开始</div>`;
+}
+function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.indexOf(i);if(idx>=0)d.splice(idx,1);else d.push(i);lsSet(k,d);genPlan()}
+function loadPlanToBuilder(){const f=$('#plan-focus').value;let picks=[];if(f.startsWith('全身')){if(f.includes('推'))picks=[...EX['胸'].slice(0,2),EX['肩'][0],EX['三头'][0]];else if(f.includes('拉'))picks=[...EX['背'].slice(0,2),EX['二头'][0],EX['背'][4]];else if(f.includes('腿'))picks=[...EX['腿'].slice(0,3),EX['核心'][0]];else picks=[EX['胸'][0],EX['背'][0],EX['肩'][0],EX['腿'][0],EX['核心'][0]]}else if(EX[f])picks=EX[f].slice(0,5);builder=picks.map(e=>({n:e.n,sets:'',reps:'',wt:'',rpe:''}));if($('#tr-part').value==='')$('#tr-part').value=f.startsWith('全身')?'':f;trainTab('record');renderBuilder()}
+
+/* ===== 统一内容卡片 ===== */
+let liked=ls('qx_liked',[]);if(liked.length&&typeof liked[0]==='string')liked=[];
+let saved=ls('qx_saved',[]);
+const artKey=a=>(a.cat||'')+'|'+(a.t||'');
+const hasLiked=a=>liked.some(x=>artKey(x)===artKey(a));
+const hasSaved=a=>saved.some(x=>artKey(x)===artKey(a));
+function artCard(a){
+  const ds=encodeURIComponent(JSON.stringify({c:a.cat,t:a.t,s:a.s,link:a.link,tag:a.tag}));
+  const lk=hasLiked(a),sv=hasSaved(a);
+  const tc=a.tag&&(a.tag.includes('二创')||a.tag.includes('种草'))?'gold':'mint';
+  const hasLink=a.link&&a.link!=='#';
+  return `<div class="art-card">
+    <svg class="cat-paw" viewBox="0 0 24 24" style="width:22px;height:22px"><ellipse cx="12" cy="16" rx="7" ry="6" fill="#e8e0d0"/><circle cx="7" cy="10" r="2.5" fill="#e8e0d0"/><circle cx="17" cy="10" r="2.5" fill="#e8e0d0"/><circle cx="12" cy="7" r="2.5" fill="#e8e0d0"/></svg>
+    <div class="art-title">${esc(a.t)}</div>
+    ${a.s?`<div class="art-sum">${esc(a.s)}</div>`:''}
+    ${a.tag?`<div style="margin-top:6px"><span class="tag ${tc}">${esc(a.tag)}</span></div>`:''}
+    ${hasLink?`<a href="${esc(a.link)}" target="_blank" rel="noopener" class="sm pri-link" style="display:inline-block;margin-top:8px">查看原文 ↗</a>`:''}
+    <div class="art-actions">
+      <button class="${lk?'on liked':''}" onclick="artClick('${ds}','like')">👍<span>${lk?'已赞':'赞'}</span></button>
+      <button class="${sv?'on saved':''}" onclick="artClick('${ds}','save')">⭐<span>${sv?'已藏':'收藏'}</span></button>
+      <button onclick="artClick('${ds}','share')">📤分享</button>
+    </div>
+  </div>`;
+}
+function artClick(ds,act){
+  const a=JSON.parse(decodeURIComponent(ds));
+  const k=artKey({cat:a.c,t:a.t});
+  if(act==='like'){
+    if(liked.some(x=>artKey(x)===k)){liked=liked.filter(x=>artKey(x)!==k)}
+    else{liked=[{cat:a.c,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...liked];confetti(['👍','❤️','✨'])}
+    lsSet('qx_liked',liked);
+  }else if(act==='save'){
+    if(saved.some(x=>artKey(x)===k)){saved=saved.filter(x=>artKey(x)!==k)}
+    else{saved=[{cat:a.c,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...saved];confetti(['⭐','✨','🌟'])}
+    lsSet('qx_saved',saved);
+  }else if(act==='share'){
+    const txt=`【${a.c||''}】${a.t}\n${a.s||''}`+(a.link&&a.link!=='#'?`\n${a.link}`:'');
+    if(navigator.share){navigator.share({title:a.t,text:txt,url:a.link&&a.link!=='#'?a.link:''}).catch(()=>{})}
+    else{navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>alert('已复制，去微信粘贴给朋友讨论')):prompt('复制分享内容：',txt)}
+    return;
+  }
+  if($('#view-news').classList.contains('active'))renderNews();
+  /* 散户板块用自身 stockCard，不经过 artClick 的赞/藏/分享 */
+  updateHome();
+}
+function savedItemCard(x,idx,isLike){
+  const link=x.link&&x.link!=='#';
+  return `<div class="art-card">
+    <div class="row between"><div style="flex:1" class="art-title">${esc(x.t)}</div><button class="art-btn-x" onclick="${isLike?'unlikeItem':'unsaveItem'}(${idx})">✕</button></div>
+    ${x.s?`<div class="art-sum">${esc(x.s)}</div>`:''}
+    <div class="sm muted">${esc(x.cat||'')}${x.tag?' · '+esc(x.tag):''}${x.ts?' · '+new Date(x.ts).toLocaleDateString('zh-CN'):''}</div>
+    ${link?`<a href="${esc(x.link)}" target="_blank" rel="noopener" class="sm pri-link" style="display:inline-block;margin-top:6px">查看原文 ↗</a>`:''}
+  </div>`;
+}
+function unsaveItem(idx){saved.splice(idx,1);lsSet('qx_saved',saved);renderNews();updateHome()}
+function unlikeItem(idx){liked.splice(idx,1);lsSet('qx_liked',liked);renderNews();updateHome()}
+
+/* ===== 资讯 ===== */
+let NEWS_FEED=null,PET_FEED=null,feedLoaded=false;
+async function loadFeed(){
+ if(feedLoaded){renderNews();return}
+ feedLoaded=true;
+ try{const r=await fetch('feed.json?_='+Date.now());if(r.ok){const d=await r.json();if(Array.isArray(d)&&d.length)NEWS_FEED=d}}catch(e){}
+ try{const r2=await fetch('pet.json?_='+Date.now());if(r2.ok){const d2=await r2.json();if(Array.isArray(d2)&&d2.length)PET_FEED=d2}}catch(e){}
+ renderNews();
+}
+let savedTab='saved';
+function switchSavedTab(t){
+ savedTab=t;
+ document.querySelectorAll('[data-savtab]').forEach(b=>b.classList.toggle('active',b.dataset.savtab===t));
+ $('#saved-list').style.display=t==='saved'?'block':'none';
+ $('#liked-list').style.display=t==='liked'?'block':'none';
+}
+function renderNews(){
+ $('#saved-list').innerHTML=saved.length?saved.map((x,i)=>savedItemCard(x,i,false)).join(''):`<div class="empty">${catNap}还没有收藏，看到喜欢的点 ⭐</div>`;
+ $('#saved-cnt').textContent=saved.length;
+ $('#liked-list').innerHTML=liked.length?liked.map((x,i)=>savedItemCard(x,i,true)).join(''):`<div class="empty">${catNap}还没有点赞，看到喜欢的点 👍</div>`;
+ $('#liked-cnt').textContent=liked.length;
+ $('#news-list').innerHTML=(NEWS_FEED||NEWS).map(g=>`<div style="margin-bottom:14px"><div class="row between" style="margin:0 4px 12px"><b style="font-size:15px;color:var(--ink2)">${esc(g.cat)}</b></div>${g.items.map(i=>artCard({cat:g.cat,t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('')}</div>`).join('');
+ $('#pet-list').innerHTML=(PET_FEED||PET).map(i=>artCard({cat:'宠物',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('');
+ $('#qc-news').textContent='AI·电商·DTC 等5条线';
+ $('#fav-total').textContent='⭐ '+saved.length+' · 👍 '+liked.length;
+ updateHome();
+}
+
+/* ===== 散户进化论（股市入门） ===== */
+let STOCK_FEED=null,stockFeedLoaded=false,stockBatch=ls('qx_stock_batch',1),stockLearned=ls('qx_stock_learned',[]),currentStockItem=null;
+function stockKey(i){return (i.cat||'')+'|'+i.t}
+function isStockLearned(i){return stockLearned.some(x=>x===stockKey(i))}
+function initStock(){}
+async function loadStockFeed(){
+ if(stockFeedLoaded){renderStockList();return}
+ stockFeedLoaded=true;
+ try{const r=await fetch('stock_feed.json?_='+Date.now());if(r.ok){const d=await r.json();if(Array.isArray(d)&&d.length)STOCK_FEED=d}}catch(e){}
+ renderStockList();
+}
+function maxBatchOf(feed){return Math.max(1,...feed.map(i=>i.batch||1))}
+function renderStockList(){
+ const feed=STOCK_FEED||STOCK_SAMPLE;
+ const mb=maxBatchOf(feed);
+ const batchItems=feed.filter(i=>(i.batch||1)===(stockBatch||1));
+ const done=batchItems.filter(i=>isStockLearned(i)).length;
+ $('#stock-progress').innerHTML=`<div class="row between" style="margin:0 4px 8px"><b>第 ${stockBatch} 批 / 共 ${mb} 批</b><span class="tag mint">已学 ${done}/${batchItems.length}</span></div>`;
+ $('#stock-list').innerHTML=batchItems.map(i=>stockCard(i)).join('');
+ const allDone=done===batchItems.length&&batchItems.length>0;
+ if(allDone&&stockBatch<mb){
+  $('#stock-next').innerHTML=`<button class="big-btn" onclick="nextStockBatch()">🎉 本批学完，进入第 ${stockBatch+1} 批</button>`;
+ }else if(allDone&&stockBatch>=mb){
+  $('#stock-next').innerHTML=`<div class="empty">全部批次学完啦，后续会持续更新 💪</div>`;
+ }else{
+  $('#stock-next').innerHTML='';
+ }
+}
+function stockCard(i){
+ const l=isStockLearned(i);
+ const ds=encodeURIComponent(JSON.stringify({cat:i.cat,t:i.t,s:i.s,body:i.body,tag:i.tag,source:i.source})).replace(/'/g,'%27');
+ return `<div class="art-card ${l?'learned':''}">
+  <div class="art-title">${esc(i.t)}</div>
+  <div class="art-sum">${esc(i.s)}</div>
+  ${i.cat?`<div style="margin-top:6px"><span class="tag">${esc(i.cat)}</span></div>`:''}
+  <div class="art-actions">
+   <button class="${l?'on':''}" onclick="openStockDetail('${ds}')">${l?'✓ 已学':'阅读 →'}</button>
+  </div>
+ </div>`;
+}
+function openStockDetail(ds){
+ const i=JSON.parse(decodeURIComponent(ds));
+ currentStockItem=i;
+ renderStockDetail();
+ go('stock-detail');
+}
+function renderStockDetail(){
+ const i=currentStockItem;if(!i)return;
+ const l=isStockLearned(i);
+ const bodyHtml=(i.body||'').split('\n').map(p=>`<p>${esc(p)}</p>`).join('');
+ $('#stock-detail').innerHTML=`
+  <h2 style="font-size:19px;line-height:1.4;margin:4px 0 10px">${esc(i.t)}</h2>
+  ${i.cat?`<span class="tag">${esc(i.cat)}</span>`:''}
+  ${i.source?`<div style="font-size:12px;color:var(--muted);margin:8px 0">来源：${esc(i.source)}</div>`:''}
+  <div class="article-body" style="margin-top:10px">${bodyHtml}</div>
+  <button class="big-btn ${l?'on':''}" style="margin-top:16px;width:100%" onclick="toggleStockLearned()">${l?'✓ 已学习':'标记为已学习'}</button>
+ `;
+}
+function toggleStockLearned(){
+ if(!currentStockItem)return;
+ const k=stockKey(currentStockItem);
+ if(stockLearned.some(x=>x===k)){stockLearned=stockLearned.filter(x=>x!==k)}
+ else{stockLearned=[...stockLearned,k];confetti(['✨','💡','📈'])}
+ lsSet('qx_stock_learned',stockLearned);
+ renderStockDetail();
+ renderStockList();
+}
+function nextStockBatch(){stockBatch=(stockBatch||1)+1;lsSet('qx_stock_batch',stockBatch);renderStockList();$('#view-stock').scrollTop=0;}
+
+/* ===== 复盘 & 灵感 ===== */
+let ideas=ls('qx_ideas',[]);
+function loadReflection(){
+ const r=ls('qx_reflection_'+today(),{q1:'',q2:'',q3:''});
+ $('#rf-1').value=r.q1;$('#rf-2').value=r.q2;$('#rf-3').value=r.q3;
+ $('#rf-today').textContent=r.q1?'今日已记 ✓':'今日未记';
+ $('#rf-status')&&($('#rf-status').textContent=r.q1?'已保存今日复盘 ✓':'尚未记录');
+ renderReflectionHistory();renderIdeas();
+}
+function saveReflection(){
+ const r={q1:$('#rf-1').value,q2:$('#rf-2').value,q3:$('#rf-3').value};
+ lsSet('qx_reflection_'+today(),r);
+ $('#rf-today').textContent='今日已记 ✓';
+ renderReflectionHistory();updateHome();updateOverallStreak();
+ confetti(['📝','✨','🌱']);
+}
+function renderReflectionHistory(){
+ const keys=Object.keys(localStorage).filter(k=>k.startsWith('qx_reflection_')&&k!=='qx_reflection_'+today()).sort().reverse();
+ const items=keys.map(k=>{const d=k.replace('qx_reflection_','');const r=ls(k,{q1:'',q2:'',q3:''});return(r.q1||r.q2||r.q3)?{date:d,...r}:null}).filter(Boolean);
+ $('#rf-history').innerHTML=items.length?items.map(r=>`<div class="rf-item"><div class="row between"><b>${esc(r.date)}</b><span class="badge">🌱 已沉淀</span></div>${r.q1?`<div class="sm" style="margin-top:6px">✅ ${esc(r.q1)}</div>`:''}${r.q2?`<div class="sm" style="margin-top:4px">🔍 ${esc(r.q2)}</div>`:''}${r.q3?`<div class="sm" style="margin-top:4px">🎯 ${esc(r.q3)}</div>`:''}</div>`).join(''):`<div class="empty">${catNap}还没有历史复盘</div>`;
+}
+function addIdea(){
+ const t=$('#idea-in').value.trim();if(!t)return;
+ const isLink=/^https?:\/\//i.test(t);
+ ideas.unshift({t,ts:Date.now(),isLink});
+ lsSet('qx_ideas',ideas);
+ $('#idea-in').value='';renderIdeas();
+ confetti(['💡','✨']);
+}
+function renderIdeas(){
+ $('#idea-list').innerHTML=ideas.length?ideas.map((i,idx)=>`<div class="art-card"><div class="row between"><div style="flex:1;font-size:14px">${i.isLink?'🔗 ':''}${i.isLink?`<a href="${esc(i.t)}" target="_blank" rel="noopener" class="pri-link">${esc(i.t.length>50?i.t.slice(0,50)+'…':i.t)}</a>`:esc(i.t)}</div><button class="art-btn-x" onclick="delIdea(${idx})">✕</button></div><div class="sm muted">${new Date(i.ts).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}${i.isLink?' · 链接待解析':''}</div></div>`).join(''):`<div class="empty">${catNap}灵感箱还是空的，随手记下来</div>`;
+}
+function delIdea(i){ideas.splice(i,1);lsSet('qx_ideas',ideas);renderIdeas()}
+
+/* ===== streaks & gamification ===== */
+function calcTrainStreak(){
+  if(!sessions.length)return 0;
+  const dates=[...new Set(sessions.map(s=>s.date))].sort().reverse();
+  const t=today();
+  let streak=0;let cur=new Date(t);
+  for(const d of dates){
+    const cd=cur.toISOString().slice(0,10);
+    if(d===cd){streak++;cur.setDate(cur.getDate()-1)}
+    else if(d===new Date(cur.getTime()-86400000).toISOString().slice(0,10)){streak++;cur.setDate(cur.getDate()-2)}
+    else break;
+  }
+  return streak;
+}
+function updateTrainStreak(){
+  const s=calcTrainStreak();
+  $('#train-streak')&&($('#train-streak').textContent=s?'🔥 连续 '+s+' 天':'连续 0 天');
+}
+function updateOverallStreak(){
+  const dates=new Set();
+  sessions.forEach(s=>dates.add(s.date));
+  if(ls('qx_reflection_'+today(),{q1:''}).q1)dates.add(today());
+  if(ideas.length&&ideas[0].ts&&new Date(ideas[0].ts).toISOString().slice(0,10)===today())dates.add(today());
+  if(liked.some(x=>x.ts&&new Date(x.ts).toISOString().slice(0,10)===today()))dates.add(today());
+  if(saved.some(x=>x.ts&&new Date(x.ts).toISOString().slice(0,10)===today()))dates.add(today());
+  const ds=[...dates].sort().reverse();
+  let streak=0;let cur=new Date(today());
+  for(const d of ds){
+    const cd=cur.toISOString().slice(0,10);
+    if(d===cd){streak++;cur.setDate(cur.getDate()-1)}
+    else if(d===new Date(cur.getTime()-86400000).toISOString().slice(0,10)){streak++;cur.setDate(cur.getDate()-2)}
+    else break;
+  }
+  $('#streak-badge').textContent='🔥 '+streak+' 天';
+}
+function confetti(icons){
+  for(let i=0;i<8;i++){
+    const el=document.createElement('div');el.className='confetti';el.textContent=icons[Math.floor(Math.random()*icons.length)];
+    el.style.left=(Math.random()*80+10)+'vw';el.style.top=(Math.random()*30+40)+'vh';
+    el.style.animationDuration=(1+Math.random()*.5)+'s';
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1500);
+  }
+}
+
+/* ===== 首页摘要 ===== */
+function updateHome(){
+ const t=new Date();
+ $('#hero-sub').textContent=(t.getMonth()+1)+'月'+t.getDate()+'日 · '+['日','一','二','三','四','五','六'][t.getDay()]+' · 好好用起来 ✦';
+ const todayS=sessions.filter(s=>s.date===today());
+ $('#qc-train').textContent=todayS.length?todayS[0].exs.length+'个动作已记录':'点击记录 / 查动作库';
+ const allBI=(STOCK_FEED||STOCK_SAMPLE);
+ if(allBI.length){const idx=dayIndex()%allBI.length;const ti=allBI[idx].t;$('#qc-stock').textContent=ti.slice(0,14)+(ti.length>14?'…':'')}
+ $('#qc-mine').textContent='复盘 & 灵感箱';
+ $('#stat-like').textContent=liked.length;
+ $('#stat-save').textContent=saved.length;
+ $('#stat-train').textContent=sessions.length;
+ updateOverallStreak();updateTrainStreak();
+}
+
+/* ===== 导出 ===== */
+function exportData(){const d={sessions,ideas,liked,saved,reflection:localStorage.getItem('qx_reflection_'+today()),exportedAt:new Date().toISOString()};const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='qx-data-'+today()+'.json';a.click()}
+
+/* ===== weekly theme ===== */
+const THEME_NAMES={1:'周一·绿野阳台',2:'周二·暖橙书房',3:'周三·薄荷厨房',4:'周四·壁炉冬夜',5:'周五·樱花飘窗',6:'周六·海边度假',7:'周日·薰衣草午睡'};
+const THEME_COLORS={1:'#dde6d4',2:'#f0e2cc',3:'#dceee8',4:'#e8dccc',5:'#f5dde4',6:'#dceaf2',7:'#e8e0f0'};
+const _dow=new Date().getDay()===0?7:new Date().getDay();
+document.body.setAttribute('data-dow',_dow);
+document.querySelectorAll('.day-label').forEach(el=>el.textContent=THEME_NAMES[_dow]||'');
+const _mtc=document.querySelector('meta[name=theme-color]');if(_mtc)_mtc.setAttribute('content',THEME_COLORS[_dow]||'#d4c4a8');
+/* theme switcher for preview */
+function initThemeSwitcher(){
+  const c=$('#theme-chips');if(!c)return;
+  [1,2,3,4,5,6,7].forEach(d=>{
+    const b=document.createElement('button');b.className='chip'+(d===_dow?' active':'');b.textContent=THEME_NAMES[d];
+    b.onclick=()=>{document.body.setAttribute('data-dow',d);c.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',THEME_COLORS[d]||'#d4c4a8')};
+    c.appendChild(b);
+  });
+}
+
+/* ===== 启动 ===== */
+initTrain();initStock();initThemeSwitcher();updateHome();
+if('serviceWorker' in navigator){/* v4 暂不注册 SW */}
+</script>
+</body>
+</html>

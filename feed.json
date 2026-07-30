@@ -1,0 +1,35 @@
+[
+{"cat":"AI","items":[
+{"t":"Kimi K3 全量开源：2.8万亿参数成全球最大开源模型","s":"月之暗面 7月27日宣布旗舰模型 Kimi K3 全量开源，含权重与技术报告，开发者可免费下载本地部署","link":"https://big5.cctv.com/gate/big5/news.cctv.cn/2026/07/30/ARTIaK95LGLEtJTPZN2zCBqO260730.shtml","tag":"开源大模型"},
+{"t":"四大实验室 7 月集体发新模型，差距明显收窄","s":"xAI Grok 4.5、Anthropic Claude Opus 5、OpenAI GPT-5.6、Moonshot Kimi K3 三周内相继发布，最强与最弱能力差缩小","link":"https://gfdaily.com/tech/en-four-ai-labs-release-new-models-in-july-performance-gap-narrows-ms2igeaa","tag":"模型竞赛"},
+{"t":"7月 LLM 发布全景：Kimi K3 开源登顶、Gemini 3.6 Flash 降价","s":"Kimi K3 以 2.8T 参数成为首个 3T 级开源权重；Gemini 3.6 Flash 输出降价且知识截止跳到 2026年3月","link":"https://presenc.ai/research/july-2026-llm-release-roundup","tag":"行业动态"},
+{"t":"DeepSeek V4 完成 API 迭代，V4Flash 成新默认","s":"旧版 API 别名退役，V4Flash 全面接替，标志 DeepSeek 进入产品矩阵稳定化阶段","link":"https://weibo.com/2677194735/5325307063829299","tag":"国产模型"},
+{"t":"OpenAI 推企业软件 Presence，进军自动化办公","s":"定位客户支持与销售流程自动化，标志 OpenAI 从消费级向企业级应用拓展","link":"https://weibo.com/2677194735/5325307063829299","tag":"AI 应用"}
+]},
+{"cat":"产品经理","items":[
+{"t":"Vibe Coding：不会写代码成伪命题，PM 最该学","s":"用自然语言指挥 AI 开发功能，七种角色压缩成你与 AI 的对话，PM 是最大受益者","link":"https://www.toutiao.com/article/7663856351969296902/","tag":"Vibe Coding"},
+{"t":"产品经理 Vibe Coding 实战：AI Agent 打通原型到代码","s":"MCP 协议让编码工具直接读原型数据，PM 从画图人变成 AI Agent 指挥官","link":"https://adg.csdn.net/6a583530662f9a54cb8fd611.html","tag":"AI Agent"},
+{"t":"2026 年 12 款 Vibe Coding 工具横评","s":"Cursor/Windsurf/Claude Code/Devin/Cline 与 Lovable/Bolt/Replit/v0 等，分开发者与非技术创始人两类","link":"https://webfixtool.com/blog/best-vibe-coding-tools","tag":"工具链"},
+{"t":"AI 原生 IDE 与编码 Agent：开发者 vs 非技术创始人怎么选","s":"同一类工具覆盖三类产品，选错比选贵更糟，按你在建什么来挑","link":"https://webfixtool.com/blog/best-vibe-coding-tools","tag":"工具趋势"}
+]},
+{"cat":"电商","items":[
+{"t":"SHEIN 第三方平台占比 14.3%，全球时尚格局生变","s":"净利下滑至 20.64 亿美元；与此同时 YouTube 英国推购物联盟、Facebook 推卖家 App","link":"https://www.ebrun.com/20260728/690661.shtml","tag":"跨境平台"},
+{"t":"跨境电商 2026 拐点：Shopify 商家 31% GMV 来自跨境","s":"中小企业跨境占比达 38%，由西欧、海湾、东南亚拉动，基础设施借口已消失","link":"https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2","tag":"跨境趋势"},
+{"t":"希音计划 8 月港 IPO 融资 30 亿美元；亚马逊旺季配送费 10 月生效","s":"中国出海要从拼价格转向拼价值、拼全球化","link":"https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991","tag":"资本动态"},
+{"t":"Amazon 标题砍到 75 字符；TikTok Shop 测试订阅","s":"TikTok Shop 8 类目上线订阅、测试 Shop Plus 会员；中国关税上限 20%","link":"https://www.directtoconsumer.co/newsletter/amazon-product-title-update-meta-campaign-structure-tiktok-subscriptions","tag":"平台规则"},
+{"t":"TikTok 多国社交购物渗透率超 FB/IG","s":"马来西亚 95%、泰国 93%、沙特 77%、英国 72%，短视频+即时购物是核心动因","link":"https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026071816330195469991","tag":"社交电商"}
+]},
+{"cat":"海外独立站","items":[
+{"t":"Shopify 将 Shop Campaigns 扩至澳大利亚：成交后才收费","s":"商家自设获客成本，仅在实际购买后扣费，降低中小卖家获客门槛","link":"https://www.amz123.com/kx/bl5BXx9Q","tag":"Shopify 广告"},
+{"t":"SHOPLINE 与 Shopify 两年版权诉讼和解，中小商家免整改","s":"Shopify 撤销全部诉讼，使用涉诉模板商家无需换主题，店铺零影响","link":"https://so.html5.qq.com/page/real/search_news?docid=70000021_4626a6380f882152","tag":"行业合规"},
+{"t":"跨境电商进入整合期：本地支付成关键","s":"用 3 种以上本地支付方式的商家弃单率低 31%；加拿大/海湾/东南亚三线增长","link":"https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026","tag":"本地化"},
+{"t":"AI 本地化让中小卖家转化率提升 19%","s":"文化适配叙事 vs 机器翻译，差异在日韩等文化距离大的市场最明显","link":"https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026","tag":"AI 本地化"},
+{"t":"欧盟 ICS2 第三阶段强制，HS 编码库成护城河","s":"早做合规的商家欧洲订单利润率显著高于仍用 workaround 的对手","link":"https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2","tag":"合规"}
+]},
+{"cat":"产品sense","items":[
+{"t":"Amazon PM Product Sense 六步框架","s":"clarify→segment→metric→options→tradeoff→pressure test，让答案有结构又不显浅","link":"https://sirjohnnymai.com/zh/blog/amazon-pm-product-sense-the-framework-that-gets-you-hired","tag":"面试框架"},
+{"t":"如何培养 Product Sense（哪怕你不是 PM）","s":"30 天计划：第1周留意、第2周拆解、第3周见真实用户、第4周开口练，核心是做 reps","link":"https://hellopm.co/how-to-develop-product-sense","tag":"能力培养"},
+{"t":"Product Sense 2026 指南：沉浸用户、研究产品、练习拆解","s":"从 Jobs-to-be-Done 到框架内化，产品感是可刻意练习的判断力","link":"https://www.parallelhq.com/blog/what-product-sense","tag":"能力培养"},
+{"t":"Product Sense 面试指南：CIRCLES 框架 + 40+ 练习题","s":"Comprehend→Identify→Report→Cut→List→Evaluate→Summarize，占大厂 PM 面试 30-40%","link":"https://bestpmjobs.com/resources/product-sense-interview","tag":"面试框架"}
+]}
+]
