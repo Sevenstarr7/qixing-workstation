@@ -1085,11 +1085,33 @@ function updateLastRec(i){
     else{$('#builder').children[i]&&($('#builder').children[i].insertAdjacentHTML('afterend',`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组</div>`))}
   }else if(el){el.remove()}
 }
+// 智能沉淀（方案B）：记录≥2次的动作自动进个人动作库
+function findMeta(n){for(const p of PARTS){const x=EX[p].find(e=>e.n===n);if(x)return x;}return null;}
+function accumulateEx(exs,part){
+ if(!part)return;
+ let custom=ls('qx_customEx',[]);
+ let cnt=ls('qx_exCount',{});
+ exs.forEach(e=>{
+  const n=e.n.trim();if(!n)return;
+  if(PARTS.some(p=>EX[p].some(x=>x.n===n)))return;   // 已在标准库
+  if(custom.some(x=>x.n===n))return;                 // 已在个人库
+  cnt[n]=(cnt[n]||0)+1;
+  if(cnt[n]>=2){
+   const m=findMeta(n)||{};
+   custom.push({n,part,t:m.t||'自定义',g:m.g||part,p:m.p||'',s:m.s||''});
+   cnt[n]=0;
+  }
+ });
+ lsSet('qx_exCount',cnt);
+ lsSet('qx_customEx',custom);
+}
 function saveSession(){
  const exs=builder.filter(r=>r.n.trim());
  if(!exs.length){alert('先添加至少一个动作');return}
- const s={date:$('#tr-date').value||today(),part:$('#tr-part').value,exs};
+ const part=$('#tr-part').value;
+ const s={date:$('#tr-date').value||today(),part,exs};
  sessions.unshift(s);lsSet('qx_sessions',sessions);
+ accumulateEx(exs,part);
  builder=[];addRow();$('#tr-part').value='';
  renderHistory();updateHome();updateTrainStreak();
  confetti(['💪','🔥','✨','🏋️']);
@@ -1114,15 +1136,21 @@ function delSession(i){if(!confirm('删除这条记录？'))return;sessions.spli
 function renderLib(part){
  $('#body-title').textContent=part+' · 肌群预览';
  $('#body-svg-container').innerHTML=bodySVG(part);
- const list=EX[part];
+ const std=(EX[part]||[]).map(e=>({...e,std:true}));
+ const cust=ls('qx_customEx',[]).filter(e=>e.part===part).map(e=>({...e,std:false}));
+ const list=[...std,...cust];
+ if(!list.length){$('#lib-list').innerHTML=`<div class="empty">${catNap}这个部位还没有动作，去记录里练几次就会自动沉淀进来</div>`;return;}
  $('#lib-list').innerHTML=list.map(e=>`
   <div class="art-card">
    ${miniCat('#e07a5f','#fff')}
    <div class="row between"><div class="art-title">${esc(e.n)}</div><span class="tag">${esc(e.t)}</span></div>
    <div class="sm muted" style="margin-top:4px">🎯 ${esc(e.g)}</div>
-   <div class="sm" style="margin-top:4px;color:var(--ink2)">💡 ${esc(e.p)}</div>
-   <div class="sm muted" style="margin-top:4px">📊 建议:${esc(e.s)}</div>
-   <button class="btn ghost sm" style="margin-top:10px;width:auto" onclick="addToBuilder('${esc(e.n)}','${esc(part)}')">+ 加入今日训练</button>
+   ${e.p?`<div class="sm" style="margin-top:4px;color:var(--ink2)">💡 ${esc(e.p)}</div>`:`<div class="sm muted" style="margin-top:4px">💡 暂无要点</div>`}
+   ${e.s?`<div class="sm muted" style="margin-top:4px">📊 建议:${esc(e.s)}</div>`:`<div class="sm muted" style="margin-top:4px">📊 建议:暂未设置</div>`}
+   <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn ghost sm" style="width:auto" onclick="addToBuilder('${esc(e.n)}','${esc(part)}')">+ 加入今日训练</button>
+    ${!e.std&&(!e.p||!e.s)?`<button class="btn ghost sm" style="width:auto;background:var(--honey2);color:#8a6a25" onclick="editExMeta('${esc(e.n)}')">✏️ 补充要点</button>`:''}
+   </div>
   </div>`).join('');
 }
 function addToBuilder(n,part){
@@ -1130,6 +1158,15 @@ function addToBuilder(n,part){
  if($('#tr-part').value==='')$('#tr-part').value=part;
  builder.push({n,sets:'',reps:'',wt:'',rpe:''});renderBuilder();
  trainTab('record');
+}
+function editExMeta(n){
+ const c=ls('qx_customEx',[]);const x=c.find(e=>e.n===n);if(!x)return;
+ const p=prompt('为「'+n+'」补充要点（一行即可）：',x.p||'');
+ if(p===null)return;
+ const s=prompt('建议组数（如 4×8-12）：',x.s||'');
+ if(s===null)return;
+ x.p=p;x.s=s;const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
+ renderLib(x.part||$('#tr-part').value||'胸');
 }
 function genPlan(){
  const f=$('#plan-focus').value;let picks=[];
