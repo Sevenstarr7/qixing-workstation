@@ -1073,9 +1073,7 @@ function renderBuilder(){
   <div class="ex-row">
    <input list="ex-dl" placeholder="动作名" value="${esc(r.n)}" oninput="builder[${i}].n=this.value;updateLastRec(${i})" style="flex:2">
    <input class="mini" placeholder="组数" type="number" inputmode="numeric" value="${esc(r.sets)}" oninput="builder[${i}].sets=this.value">
-   <input class="mini" placeholder="次/秒" value="${esc(r.reps)}" oninput="builder[${i}].reps=this.value">
    <input class="mini" placeholder="kg" value="${esc(r.wt)}" oninput="builder[${i}].wt=this.value">
-   <input class="mini" placeholder="RPE" type="number" inputmode="numeric" min="1" max="10" value="${esc(r.rpe)}" oninput="builder[${i}].rpe=this.value">
    <button class="del" onclick="builder.splice(${i},1);renderBuilder()">×</button>
   </div>${r.n?(()=>{const lr=getLastRecord(r.n);return lr?`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}</div>`:''})():''}`).join('');
 }
@@ -1083,8 +1081,8 @@ function updateLastRec(i){
   const el=$('#lr-'+i);
   const lr=getLastRecord(builder[i].n);
   if(lr){
-    if(el){el.textContent=`上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}`}
-    else{$('#builder').children[i]&&($('#builder').children[i].insertAdjacentHTML('afterend',`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组 × ${lr.reps||'?'}</div>`))}
+    if(el){el.textContent=`上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组`}
+    else{$('#builder').children[i]&&($('#builder').children[i].insertAdjacentHTML('afterend',`<div class="last-rec" id="lr-${i}">上次 ${lr.wt||'?'}kg × ${lr.sets||'?'}组</div>`))}
   }else if(el){el.remove()}
 }
 function saveSession(){
@@ -1106,8 +1104,8 @@ function renderHistory(){
     <div><b>${esc(s.date)}</b> ${s.part?'<span class="tag">'+esc(s.part)+'</span>':''} <span class="sm muted">${s.exs.length}个动作</span></div>
     <div><button class="btn sm ghost" style="padding:5px 12px" onclick="loadToBuilder(${i})">载入</button> <button class="btn sm" style="padding:5px 12px;background:var(--rose2);color:#a85a5a;box-shadow:0 2px 0 #dcc0c0" onclick="delSession(${i})">删</button></div>
    </div>
-   <table class="ex-table"><tr><th>动作</th><th>组</th><th>次/秒</th><th>kg</th><th>RPE</th></tr>
-   ${s.exs.map(e=>`<tr><td>${esc(e.n)}</td><td>${esc(e.sets)}</td><td>${esc(e.reps)}</td><td>${esc(e.wt)}</td><td>${esc(e.rpe)}</td></tr>`).join('')}
+   <table class="ex-table"><tr><th>动作</th><th>组</th><th>kg</th></tr>
+   ${s.exs.map(e=>`<tr><td>${esc(e.n)}</td><td>${esc(e.sets)}</td><td>${esc(e.wt)}</td></tr>`).join('')}
    </table>
   </div>`).join('');
 }
