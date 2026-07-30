@@ -105,7 +105,7 @@ h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
 .btn.sm{padding:8px 14px;font-size:13px;width:auto}
 
 /* sketchbook inputs */
-input,textarea,select{font-family:inherit;font-size:14px;width:100%;border:2px dashed var(--line);border-radius:16px 20px 14px 22px;padding:12px 14px;background:#fff;color:var(--ink);outline:none;box-shadow:0 3px 0 #e8e0d5 inset}
+input,textarea,select{font-family:inherit;font-size:14px;width:100%;border:1.5px solid #d8ccb2;border-radius:12px 14px 10px 16px;padding:10px 12px;background:#fff;color:var(--ink);outline:none;box-shadow:0 2px 0 #ebe3d6 inset;transition:border-color .15s}
 input:focus,textarea:focus,select:focus{border-color:var(--coral);box-shadow:0 0 0 3px var(--coral2)}
 textarea{resize:vertical;min-height:72px}
 label.fl{font-size:12px;color:var(--ink2);margin-bottom:6px;display:block;font-weight:700}
@@ -118,7 +118,7 @@ label.fl{font-size:12px;color:var(--ink2);margin-bottom:6px;display:block;font-w
 .chip:active{transform:translateY(1px)}
 
 /* exercise rows */
-.ex-row{display:flex;gap:8px;align-items:center;background:var(--paper2);border-radius:16px 20px 14px 22px;padding:10px;margin-bottom:10px;flex-wrap:wrap;border:2px dashed var(--line);transform:rotate(-.3deg)}
+.ex-row{display:flex;gap:8px;align-items:center;background:var(--paper2);border-radius:12px 14px 10px 16px;padding:8px;margin-bottom:8px;flex-wrap:wrap;border:1.5px solid #d8ccb2}
 .ex-row input{flex:1;min-width:0;box-shadow:none}
 .ex-row .mini{width:56px}
 .ex-row .del{width:34px;padding:10px 0;text-align:center;background:var(--rose2);color:#a85a5a;border:0;border-radius:12px 16px 10px 18px;font-size:18px;cursor:pointer;box-shadow:0 3px 0 #dcc0c0}
@@ -131,9 +131,9 @@ label.fl{font-size:12px;color:var(--ink2);margin-bottom:6px;display:block;font-w
 .empty .cat-illu{display:block;margin:0 auto 10px;animation:float 3.5s ease-in-out infinite}
 
 /* bottom nav floating hand-drawn dock */
-.bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:calc(100% - 28px);max-width:444px;background:var(--paper);backdrop-filter:blur(12px);border-radius:30px 26px 32px 28px;padding:8px 6px calc(6px + var(--safe-b));z-index:50;box-shadow:0 8px 0 rgba(90,78,60,.15),0 14px 28px rgba(90,78,60,.15);border:2px dashed var(--line);display:flex;height:68px;transform:translateX(-50%) rotate(-.3deg)}
-.bottomnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--muted);cursor:pointer;font-weight:700;border-radius:18px 16px 20px 14px;padding:6px 2px;transition:.15s;font-family:'ZCOOL KuaiLe',cursive}
-.bottomnav button.active{color:#fff;background:var(--olive);box-shadow:0 4px 0 var(--accent-d);transform:translateY(-4px)}
+.bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:calc(100% - 28px);max-width:444px;background:var(--paper);backdrop-filter:blur(12px);border-radius:30px 26px 32px 28px;padding:6px 6px calc(6px + var(--safe-b));z-index:50;box-shadow:0 8px 0 rgba(90,78,60,.15),0 14px 28px rgba(90,78,60,.15);border:2px dashed var(--line);display:flex;height:72px;align-items:center}
+.bottomnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;color:var(--muted);cursor:pointer;font-weight:700;border-radius:18px 16px 20px 14px;padding:2px 2px;transition:.15s;font-family:'ZCOOL KuaiLe',cursive;min-width:0}
+.bottomnav button.active{color:#fff;background:var(--olive);box-shadow:0 3px 0 var(--accent-d);transform:translateY(-2px)}
 .bottomnav .ic{font-size:20px;line-height:1}
 
 /* hero scene */
@@ -224,7 +224,7 @@ label.fl{font-size:12px;color:var(--ink2);margin-bottom:6px;display:block;font-w
 .rf-item{background:#fff;border-radius:16px 20px 14px 22px;padding:12px;margin-bottom:8px;border:2px dashed var(--line);transform:rotate(-.3deg)}
 
 /* floating cat decoration on sections */
-.floating-cat{position:absolute;right:14px;top:14px;width:40px;height:40px;opacity:.5;animation:float 3.5s ease-in-out infinite}
+.floating-cat{position:absolute;right:8px;top:8px;width:30px;height:30px;opacity:.42;animation:float 3.5s ease-in-out infinite;pointer-events:none}
 
 /* link style */
 a.pri-link{color:var(--coral);text-decoration:none;font-weight:700;border-bottom:2px dashed var(--coral2)}
