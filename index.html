@@ -1230,17 +1230,43 @@ function addToBuilder(n,part){
  builder.push({n,sets:'',reps:'',wt:'',rpe:''});renderBuilder();
  trainTab('record');
 }
-async function editExMeta(n){
+function editExMeta(n){
  const c=ls('qx_customEx',[]);const x=c.find(e=>e.n===n);if(!x)return;
- const p=prompt('为「'+n+'」补充要点（一行即可）：',x.p||'');
- if(p===null)return;
- const s=prompt('建议组数（如 4×8-12）：',x.s||'');
- if(s===null)return;
- const np=await pickPart(n);   // 新增：单独选部位，修正错标
- x.p=p;x.s=s;x.part=np;
- const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
- syncToCloud();
- renderLib(x.part||$('#tr-part').value||'胸');
+ const ov=document.createElement('div');
+ ov.style.cssText='position:fixed;inset:0;background:rgba(60,52,40,.35);display:flex;align-items:flex-start;justify-content:center;z-index:200;padding-top:16%';
+ const card=document.createElement('div');
+ card.style.cssText='background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:18px;max-width:340px;width:88%;box-shadow:0 10px 30px rgba(90,78,60,.25);font-family:ZCOOL KuaiLe';
+ let selPart=x.part||'胸';
+ card.innerHTML=
+  '<div style="font-size:15px;margin-bottom:10px;color:var(--ink)">「'+esc(n)+'」补全信息</div>'+
+  '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">📍 部位（可修正错标）</div>'+
+  '<div id="ex-part-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>'+
+  '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">💡 要点</div>'+
+  '<input id="ex-p" style="width:100%;box-sizing:border-box;border:1.5px solid #d8ccb2;border-radius:10px;padding:8px;font-family:inherit;font-size:13px;margin-bottom:12px" placeholder="如：慢起慢落，顶峰收缩" value="'+esc(x.p||'')+'">'+
+  '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">📊 建议组数</div>'+
+  '<input id="ex-s" list="grpreset" style="width:100%;box-sizing:border-box;border:1.5px solid #d8ccb2;border-radius:10px;padding:8px;font-family:inherit;font-size:13px;margin-bottom:14px" placeholder="如 4×8-12" value="'+esc(x.s||'')+'">'+
+  '<datalist id="grpreset"><option value="4×8-12"><option value="3×10-12"><option value="5×5"><option value="3×12"><option value="4×10"><option value="3×15"><option value="4×12"></datalist>'+
+  '<div style="display:flex;gap:10px"><button id="ex-save" style="flex:1;background:var(--olive);color:#fff;border:0;border-radius:12px;padding:10px;font-family:ZCOOL KuaiLe;cursor:pointer">保存</button><button id="ex-cancel" style="flex:1;background:#fff;color:var(--ink);border:1.5px solid #d8ccb2;border-radius:12px;padding:10px;font-family:ZCOOL KuaiLe;cursor:pointer">取消</button></div>';
+ ov.appendChild(card);document.body.appendChild(ov);
+ const wrap=ov.querySelector('#ex-part-wrap');
+ PARTS.forEach(p=>{
+  const b=document.createElement('button');
+  b.textContent=p;b.dataset.p=p;
+  const on=p===selPart;
+  b.style.cssText='border:1.5px solid #d8ccb2;background:'+(on?'var(--olive)':'#fff')+';color:'+(on?'#fff':'var(--ink)')+';border-radius:10px;padding:6px 10px;cursor:pointer;font-family:ZCOOL KuaiLe;font-size:12px';
+  b.onclick=()=>{selPart=p;wrap.querySelectorAll('button').forEach(bb=>{const o2=bb.dataset.p===p;bb.style.background=o2?'var(--olive)':'#fff';bb.style.color=o2?'#fff':'var(--ink)';});};
+  wrap.appendChild(b);
+ });
+ ov.querySelector('#ex-cancel').onclick=()=>ov.remove();
+ ov.querySelector('#ex-save').onclick=()=>{
+  const p=ov.querySelector('#ex-p').value.trim();
+  const s=ov.querySelector('#ex-s').value.trim();
+  x.p=p;x.s=s;x.part=selPart;
+  const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
+  syncToCloud();
+  ov.remove();
+  renderLib(selPart||$('#tr-part').value||'胸');
+ };
 }
 function genPlan(){
  const f=$('#plan-focus').value;let picks=[];
