@@ -1204,6 +1204,7 @@ function renderHistory(){
 }
 function loadToBuilder(i){builder=sessions[i].exs.map(e=>({...e}));$('#tr-date').value=sessions[i].date;$('#tr-part').value=sessions[i].part;trainTab('record');renderBuilder();window.scrollTo(0,0)}
 function delSession(i){if(!confirm('删除这条记录？'))return;sessions.splice(i,1);lsSet('qx_sessions',sessions);renderHistory();updateHome();updateTrainStreak()}
+function delEx(n){if(!confirm('确定从个人动作库删除「'+n+'」吗？\n（训练历史里的记录不受影响）'))return;let c=ls('qx_customEx',[]);c=c.filter(e=>e.n!==n);lsSet('qx_customEx',c);let cnt=ls('qx_exCount',{});if(cnt[n]!==undefined){delete cnt[n];lsSet('qx_exCount',cnt);}syncToCloud();renderLib($('#tr-part').value||'胸');}
 function renderLib(part){
  $('#body-title').textContent=part+' · 肌群预览';
  $('#body-svg-container').innerHTML=bodySVG(part);
@@ -1221,6 +1222,7 @@ function renderLib(part){
    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn ghost sm" style="width:auto" onclick="addToBuilder('${esc(e.n)}','${esc(part)}')">+ 加入今日训练</button>
     ${!e.std&&(!e.p||!e.s)?`<button class="btn ghost sm" style="width:auto;background:var(--honey2);color:#8a6a25" onclick="editExMeta('${esc(e.n)}')">✏️ 补充要点</button>`:''}
+    ${!e.std?`<button class="btn ghost sm" style="width:auto;background:#fdecea;color:#b3402f" onclick="delEx('${esc(e.n)}')">🗑️ 删除</button>`:''}
    </div>
   </div>`).join('');
 }
