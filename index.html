@@ -781,10 +781,16 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
     <p class="sub">每日精读 · 每周宠物行业情报 · 散户进化论</p>
     <div class="card">
       <div class="sec-head"><h3>我的沉淀</h3><span class="badge" id="fav-total">⭐ 0 · 👍 0</span></div>
-      <div class="chips" style="margin:8px 0 10px">
+      <div class="chips" style="margin:8px 0 6px">
         <button class="chip active" data-savtab="saved" onclick="switchSavedTab('saved')">⭐ 收藏 <span id="saved-cnt">0</span></button>
         <button class="chip" data-savtab="liked" onclick="switchSavedTab('liked')">👍 点赞 <span id="liked-cnt">0</span></button>
       </div>
+      <div class="chips" style="margin:0 0 8px">
+        <button class="chip active" data-modtab="all" onclick="switchModTab('all')">全部</button>
+        <button class="chip" data-modtab="news" onclick="switchModTab('news')">🧠 脑蛋白</button>
+        <button class="chip" data-modtab="pet" onclick="switchModTab('pet')">🐾 宠物</button>
+      </div>
+      <input id="saved-kw" placeholder="🔍 搜标题 / 要点 / 标签…" oninput="onSavedKw(this.value)" style="margin:0 0 10px">
       <div id="saved-list"></div>
       <div id="liked-list" style="display:none"></div>
     </div>
@@ -1290,11 +1296,13 @@ function loadPlanToBuilder(){const f=$('#plan-focus').value;let picks=[];if(f.st
 /* ===== 统一内容卡片 ===== */
 let liked=ls('qx_liked',[]);if(liked.length&&typeof liked[0]==='string')liked=[];
 let saved=ls('qx_saved',[]);
+liked=liked.map(x=>({...x,mod:x.mod||(x.cat==='宠物'?'pet':'news')}));
+saved=saved.map(x=>({...x,mod:x.mod||(x.cat==='宠物'?'pet':'news')}));
 const artKey=a=>(a.cat||'')+'|'+(a.t||'');
 const hasLiked=a=>liked.some(x=>artKey(x)===artKey(a));
 const hasSaved=a=>saved.some(x=>artKey(x)===artKey(a));
 function artCard(a){
-  const ds=encodeURIComponent(JSON.stringify({c:a.cat,t:a.t,s:a.s,link:a.link,tag:a.tag})).replace(/'/g,'%27');
+  const ds=encodeURIComponent(JSON.stringify({c:a.cat,t:a.t,s:a.s,link:a.link,tag:a.tag,m:a.mod})).replace(/'/g,'%27');
   const lk=hasLiked(a),sv=hasSaved(a);
   const tc=a.tag&&(a.tag.includes('二创')||a.tag.includes('种草'))?'gold':'mint';
   const hasLink=a.link&&a.link!=='#';
@@ -1316,11 +1324,11 @@ function artClick(ds,act){
   const k=artKey({cat:a.c,t:a.t});
   if(act==='like'){
     if(liked.some(x=>artKey(x)===k)){liked=liked.filter(x=>artKey(x)!==k)}
-    else{liked=[{cat:a.c,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...liked];confetti(['👍','❤️','✨'])}
+    else{liked=[{cat:a.c,mod:a.m,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...liked];confetti(['👍','❤️','✨'])}
     lsSet('qx_liked',liked);
   }else if(act==='save'){
     if(saved.some(x=>artKey(x)===k)){saved=saved.filter(x=>artKey(x)!==k)}
-    else{saved=[{cat:a.c,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...saved];confetti(['⭐','✨','🌟'])}
+    else{saved=[{cat:a.c,mod:a.m,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...saved];confetti(['⭐','✨','🌟'])}
     lsSet('qx_saved',saved);
   }else if(act==='share'){
     const txt=`【${a.c||''}】${a.t}\n${a.s||''}`+(a.link&&a.link!=='#'?`\n${a.link}`:'');
@@ -1334,10 +1342,13 @@ function artClick(ds,act){
 }
 function savedItemCard(x,idx,isLike){
   const link=x.link&&x.link!=='#';
+  const isPet=x.mod==='pet';
+  const modPill=isPet?'<span class="tag gold" style="flex:none;margin-left:8px">🐾 宠物</span>':'<span class="tag mint" style="flex:none;margin-left:8px">🧠 脑蛋白</span>';
+  const meta=[isPet?'':(x.cat||''),x.tag||'',x.ts?new Date(x.ts).toLocaleDateString('zh-CN'):''].filter(Boolean).join(' · ');
   return `<div class="art-card">
-    <div class="row between"><div style="flex:1" class="art-title">${esc(x.t)}</div><button class="art-btn-x" onclick="${isLike?'unlikeItem':'unsaveItem'}(${idx})">✕</button></div>
+    <div class="row between" style="align-items:flex-start"><div style="flex:1;min-width:0" class="art-title">${esc(x.t)}</div>${modPill}<button class="art-btn-x" onclick="${isLike?'unlikeItem':'unsaveItem'}(${idx})">✕</button></div>
     ${x.s?`<div class="art-sum">${esc(x.s)}</div>`:''}
-    <div class="sm muted">${esc(x.cat||'')}${x.tag?' · '+esc(x.tag):''}${x.ts?' · '+new Date(x.ts).toLocaleDateString('zh-CN'):''}</div>
+    ${meta?`<div class="sm muted" style="margin-top:4px">${esc(meta)}</div>`:''}
     ${link?`<a href="${esc(x.link)}" target="_blank" rel="noopener" class="sm pri-link" style="display:inline-block;margin-top:6px">查看原文 ↗</a>`:''}
   </div>`;
 }
@@ -1353,22 +1364,44 @@ async function loadFeed(){
  try{const r2=await fetch('pet.json?_='+Date.now());if(r2.ok){const d2=await r2.json();if(Array.isArray(d2)&&d2.length)PET_FEED=d2}}catch(e){}
  renderNews();
 }
-let savedTab='saved';
+let savedTab='saved',savedMod='all',savedKw='';
 function switchSavedTab(t){
  savedTab=t;
  document.querySelectorAll('[data-savtab]').forEach(b=>b.classList.toggle('active',b.dataset.savtab===t));
  $('#saved-list').style.display=t==='saved'?'block':'none';
  $('#liked-list').style.display=t==='liked'?'block':'none';
+ renderSavedLists();
+}
+function switchModTab(t){
+ savedMod=t;
+ document.querySelectorAll('[data-modtab]').forEach(b=>b.classList.toggle('active',b.dataset.modtab===t));
+ renderSavedLists();
+}
+function onSavedKw(v){savedKw=v;renderSavedLists();}
+function renderSavedLists(){
+ const kw=(savedKw||'').trim().toLowerCase();
+ const arr=savedTab==='saved'?saved:liked;
+ const isLike=savedTab==='liked';
+ const matched=arr.map((x,i)=>({x,i})).filter(o=>{
+   if(savedMod!=='all' && (o.x.mod||'news')!==savedMod) return false;
+   if(kw){const hay=((o.x.t||'')+(o.x.s||'')+(o.x.tag||'')+(o.x.cat||'')).toLowerCase();if(!hay.includes(kw))return false;}
+   return true;
+ });
+ const target=savedTab==='saved'?'#saved-list':'#liked-list';
+ if(!matched.length){
+   $(target).innerHTML=`<div class="empty">${catNap}${savedMod==='all'?'这里':'这个模块'}${isLike?'还没有点赞':'还没有收藏'}${kw?'，换个关键词试试':'，看到喜欢的标记一下'}</div>`;
+   return;
+ }
+ $(target).innerHTML=matched.map(o=>savedItemCard(o.x,o.i,isLike)).join('');
 }
 function renderNews(){
- $('#saved-list').innerHTML=saved.length?saved.map((x,i)=>savedItemCard(x,i,false)).join(''):`<div class="empty">${catNap}还没有收藏，看到喜欢的点 ⭐</div>`;
  $('#saved-cnt').textContent=saved.length;
- $('#liked-list').innerHTML=liked.length?liked.map((x,i)=>savedItemCard(x,i,true)).join(''):`<div class="empty">${catNap}还没有点赞，看到喜欢的点 👍</div>`;
  $('#liked-cnt').textContent=liked.length;
- $('#news-list').innerHTML=(NEWS_FEED||NEWS).map(g=>`<div style="margin-bottom:14px"><div class="row between" style="margin:0 4px 12px"><b style="font-size:15px;color:var(--ink2)">${esc(g.cat)}</b></div>${g.items.map(i=>artCard({cat:g.cat,t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('')}</div>`).join('');
- $('#pet-list').innerHTML=(PET_FEED||PET).map(i=>artCard({cat:'宠物',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('');
- $('#qc-news').textContent='AI·电商·DTC 等5条线';
  $('#fav-total').textContent='⭐ '+saved.length+' · 👍 '+liked.length;
+ renderSavedLists();
+ $('#news-list').innerHTML=(NEWS_FEED||NEWS).map(g=>`<div style="margin-bottom:14px"><div class="row between" style="margin:0 4px 12px"><b style="font-size:15px;color:var(--ink2)">${esc(g.cat)}</b></div>${g.items.map(i=>artCard({cat:g.cat,mod:'news',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('')}</div>`).join('');
+ $('#pet-list').innerHTML=(PET_FEED||PET).map(i=>artCard({cat:'宠物',mod:'pet',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('');
+ $('#qc-news').textContent='AI·电商·DTC 等5条线';
  updateHome();
 }
 
