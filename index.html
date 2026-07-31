@@ -67,7 +67,9 @@ h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
 .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
 .view{display:none}
 .view.active{display:block;animation:softIn .26s ease-out both}
+.view.active.pop{animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes softIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
@@ -660,7 +662,7 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
 
   <!-- ===== 力训 ===== -->
   <section id="view-train" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('home',true)">🏠 首页</button><span class="day-label"></span></div>
     <h1>💪 真·增肌站</h1>
     <p class="sub">私教课 / 自练都能记，自动沉淀进个人动作库</p>
     <div class="chips" style="margin-bottom:12px">
@@ -762,7 +764,7 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
 
   <!-- ===== 散户进化论（股市入门） ===== -->
   <section id="view-stock" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('home',true)">🏠 首页</button><span class="day-label"></span></div>
     <h1>💰 散户进化论</h1>
     <p class="sub">从被割到学会跑 · 股市小白入门长文</p>
     <div id="stock-progress" style="margin-bottom:10px"></div>
@@ -770,13 +772,13 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
     <div id="stock-next" style="margin-top:10px"></div>
   </section>
   <section id="view-stock-detail" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('stock')">← 返回</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('stock',true)">← 返回</button><span class="day-label"></span></div>
     <div id="stock-detail"></div>
   </section>
 
   <!-- ===== 资讯 ===== -->
   <section id="view-news" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('home',true)">🏠 首页</button><span class="day-label"></span></div>
     <h1>📡 提纯 & 堆料</h1>
     <p class="sub">每日精读 · 每周宠物行业情报 · 散户进化论</p>
     <div class="card" style="cursor:pointer" onclick="go('saved')">
@@ -801,7 +803,7 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
 
   <!-- ===== 我的沉淀（独立子页面） ===== -->
   <section id="view-saved" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('news')">← 返回</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('news',true)">← 返回</button><span class="day-label"></span></div>
     <h1>📥 我的沉淀</h1>
     <p class="sub">赞过 / 藏起来的好内容，按模块捞回来</p>
     <div class="card">
@@ -823,7 +825,7 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
 
   <!-- ===== 我的 ===== -->
   <section id="view-mine" class="view">
-    <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
+    <div class="topbar"><button class="back-btn" onclick="go('home',true)">🏠 首页</button><span class="day-label"></span></div>
     <h1>📝 废料回收口</h1>
     <p class="sub">每天2分钟，把零散的进步沉淀下来</p>
     <div class="card">
@@ -953,9 +955,14 @@ const miniCat=(fill,stroke='#3a2820')=>{
 </svg>`;};
 
 /* ===== 视图切换 ===== */
-function go(v){
-  document.querySelectorAll('.view').forEach(e=>e.classList.toggle('active',e.id==='view-'+v));
+function go(v,back){
+  document.querySelectorAll('.view').forEach(e=>{
+    e.classList.toggle('active',e.id==='view-'+v);
+    e.classList.remove('pop');
+  });
   document.querySelectorAll('.bottomnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===v));
+  const t=document.getElementById('view-'+v);
+  if(t&&!back)t.classList.add('pop');
   window.scrollTo(0,0);
   if(v==='stock')loadStockFeed();
   if(v==='news')loadFeed();
