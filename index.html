@@ -1104,32 +1104,52 @@ function updateLastRec(i){
   }else if(el){el.remove()}
 }
 // 智能沉淀（方案B）：记录≥2次的动作自动进个人动作库
+function pickPart(n){
+ return new Promise(res=>{
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(60,52,40,.35);display:flex;align-items:center;justify-content:center;z-index:200';
+  const card=document.createElement('div');
+  card.style.cssText='background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:18px;max-width:320px;width:86%;box-shadow:0 10px 30px rgba(90,78,60,.25)';
+  card.innerHTML='<div style="font-family:ZCOOL KuaiLe;font-size:15px;margin-bottom:12px;color:var(--ink)">「'+esc(n)+'」练哪个部位？</div>';
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
+  PARTS.forEach(p=>{
+   const b=document.createElement('button');
+   b.textContent=p;
+   b.style.cssText='font-family:ZCOOL KuaiLe;border:1.5px solid #d8ccb2;background:#fff;border-radius:12px;padding:8px 12px;cursor:pointer;color:var(--ink)';
+   b.onclick=()=>{ov.remove();res(p)};
+   wrap.appendChild(b);
+  });
+  card.appendChild(wrap);ov.appendChild(card);document.body.appendChild(ov);
+ });
+}
 function findMeta(n){for(const p of PARTS){const x=EX[p].find(e=>e.n===n);if(x)return x;}return null;}
-function accumulateEx(exs,part){
+async function accumulateEx(exs,part){
  if(!part)return;
  let custom=ls('qx_customEx',[]);
  let cnt=ls('qx_exCount',{});
- exs.forEach(e=>{
-  const n=e.n.trim();if(!n)return;
-  if(PARTS.some(p=>EX[p].some(x=>x.n===n)))return;   // 已在标准库
-  if(custom.some(x=>x.n===n))return;                 // 已在个人库
+ for(const e of exs){
+  const n=e.n.trim();if(!n)continue;
+  if(PARTS.some(p=>EX[p].some(x=>x.n===n)))continue;   // 已在标准库
+  if(custom.some(x=>x.n===n))continue;                 // 已在个人库
   cnt[n]=(cnt[n]||0)+1;
   if(cnt[n]>=2){
    const m=findMeta(n)||{};
-   custom.push({n,part,t:m.t||'自定义',g:m.g||part,p:m.p||'',s:m.s||''});
+   const realPart=await pickPart(n);   // 方案A：沉淀时单独选部位，不继承训练部位
+   custom.push({n,part:realPart,t:m.t||'自定义',g:m.g||realPart,p:m.p||'',s:m.s||''});
    cnt[n]=0;
   }
- });
+ }
  lsSet('qx_exCount',cnt);
  lsSet('qx_customEx',custom);
 }
-function saveSession(){
+async function saveSession(){
  const exs=builder.filter(r=>r.n.trim());
  if(!exs.length){alert('先添加至少一个动作');return}
  const part=$('#tr-part').value;
  const s={date:$('#tr-date').value||today(),part,exs};
  sessions.unshift(s);lsSet('qx_sessions',sessions);
- accumulateEx(exs,part);
+ await accumulateEx(exs,part);
  builder=[];addRow();$('#tr-part').value='';
  renderHistory();updateHome();updateTrainStreak();
  syncToCloud();
@@ -1210,13 +1230,15 @@ function addToBuilder(n,part){
  builder.push({n,sets:'',reps:'',wt:'',rpe:''});renderBuilder();
  trainTab('record');
 }
-function editExMeta(n){
+async function editExMeta(n){
  const c=ls('qx_customEx',[]);const x=c.find(e=>e.n===n);if(!x)return;
  const p=prompt('为「'+n+'」补充要点（一行即可）：',x.p||'');
  if(p===null)return;
  const s=prompt('建议组数（如 4×8-12）：',x.s||'');
  if(s===null)return;
- x.p=p;x.s=s;const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
+ const np=await pickPart(n);   // 新增：单独选部位，修正错标
+ x.p=p;x.s=s;x.part=np;
+ const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
  syncToCloud();
  renderLib(x.part||$('#tr-part').value||'胸');
 }
