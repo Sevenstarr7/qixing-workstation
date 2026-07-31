@@ -1217,6 +1217,7 @@ function editExMeta(n){
  const s=prompt('建议组数（如 4×8-12）：',x.s||'');
  if(s===null)return;
  x.p=p;x.s=s;const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
+ syncToCloud();
  renderLib(x.part||$('#tr-part').value||'胸');
 }
 function genPlan(){
