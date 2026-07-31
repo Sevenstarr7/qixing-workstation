@@ -779,20 +779,11 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
     <div class="topbar"><button class="back-btn" onclick="go('home')">🏠 首页</button><span class="day-label"></span></div>
     <h1>📡 提纯 & 堆料</h1>
     <p class="sub">每日精读 · 每周宠物行业情报 · 散户进化论</p>
-    <div class="card">
-      <div class="sec-head"><h3>我的沉淀</h3><span class="badge" id="fav-total">⭐ 0 · 👍 0</span></div>
-      <div class="chips" style="margin:8px 0 6px">
-        <button class="chip active" data-savtab="saved" onclick="switchSavedTab('saved')">⭐ 收藏 <span id="saved-cnt">0</span></button>
-        <button class="chip" data-savtab="liked" onclick="switchSavedTab('liked')">👍 点赞 <span id="liked-cnt">0</span></button>
+    <div class="card" style="cursor:pointer" onclick="go('saved')">
+      <div class="row between">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">📥</span><b style="font-size:15px;color:var(--ink2)">我的沉淀</b></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="sm muted">⭐ <span id="entry-saved-cnt">0</span> · 👍 <span id="entry-liked-cnt">0</span></span><span style="color:var(--olive);font-size:20px;line-height:1">›</span></div>
       </div>
-      <div class="chips" style="margin:0 0 8px">
-        <button class="chip active" data-modtab="all" onclick="switchModTab('all')">全部</button>
-        <button class="chip" data-modtab="news" onclick="switchModTab('news')">🧠 脑蛋白</button>
-        <button class="chip" data-modtab="pet" onclick="switchModTab('pet')">🐾 宠物</button>
-      </div>
-      <input id="saved-kw" placeholder="🔍 搜标题 / 要点 / 标签…" oninput="onSavedKw(this.value)" style="margin:0 0 10px">
-      <div id="saved-list"></div>
-      <div id="liked-list" style="display:none"></div>
     </div>
     <div class="card">
       <div class="row between"><h3>📡 脑蛋白提纯车间</h3><span class="tag">每日</span></div>
@@ -805,6 +796,28 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
       <div class="sm muted" style="margin:4px 0 10px">老年犬关节 · 猫咪泌尿 · 老年猫犬护理 · 兽医科普 · 测评种草</div>
       <div id="pet-list"></div>
       <div class="hint">每周一、周四自动检索更新。不限于固定博主，符合方向的新鲜内容都会捞。</div>
+    </div>
+  </section>
+
+  <!-- ===== 我的沉淀（独立子页面） ===== -->
+  <section id="view-saved" class="view">
+    <div class="topbar"><button class="back-btn" onclick="go('news')">← 返回</button><span class="day-label"></span></div>
+    <h1>📥 我的沉淀</h1>
+    <p class="sub">赞过 / 藏起来的好内容，按模块捞回来</p>
+    <div class="card">
+      <div class="sec-head"><h3>沉淀箱</h3><span class="badge" id="fav-total">⭐ 0 · 👍 0</span></div>
+      <div class="chips" style="margin:8px 0 6px">
+        <button class="chip active" data-savtab="saved" onclick="switchSavedTab('saved')">⭐ 收藏 <span id="saved-cnt">0</span></button>
+        <button class="chip" data-savtab="liked" onclick="switchSavedTab('liked')">👍 点赞 <span id="liked-cnt">0</span></button>
+      </div>
+      <div class="chips" style="margin:0 0 8px">
+        <button class="chip active" data-modtab="all" onclick="switchModTab('all')">全部</button>
+        <button class="chip" data-modtab="news" onclick="switchModTab('news')">🧠 脑蛋白</button>
+        <button class="chip" data-modtab="pet" onclick="switchModTab('pet')">🐾 宠物</button>
+      </div>
+      <input id="saved-kw" placeholder="🔍 搜标题 / 要点 / 标签…" oninput="onSavedKw(this.value)" style="margin:0 0 10px">
+      <div id="saved-list"></div>
+      <div id="liked-list" style="display:none"></div>
     </div>
   </section>
 
@@ -947,6 +960,7 @@ function go(v){
   if(v==='stock')loadStockFeed();
   if(v==='news')loadFeed();
   if(v==='mine')loadReflection();
+  if(v==='saved')renderSavedLists();
 }
 
 /* ===== 数据：动作库 ===== */
@@ -1398,6 +1412,7 @@ function renderNews(){
  $('#saved-cnt').textContent=saved.length;
  $('#liked-cnt').textContent=liked.length;
  $('#fav-total').textContent='⭐ '+saved.length+' · 👍 '+liked.length;
+ const e1=$('#entry-saved-cnt'),e2=$('#entry-liked-cnt');if(e1)e1.textContent=saved.length;if(e2)e2.textContent=liked.length;
  renderSavedLists();
  $('#news-list').innerHTML=(NEWS_FEED||NEWS).map(g=>`<div style="margin-bottom:14px"><div class="row between" style="margin:0 4px 12px"><b style="font-size:15px;color:var(--ink2)">${esc(g.cat)}</b></div>${g.items.map(i=>artCard({cat:g.cat,mod:'news',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('')}</div>`).join('');
  $('#pet-list').innerHTML=(PET_FEED||PET).map(i=>artCard({cat:'宠物',mod:'pet',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('');
