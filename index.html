@@ -977,6 +977,13 @@ const EX={
   {n:'腿弯举',t:'孤立',g:'腘绳肌',p:'只小腿动,顶峰收1秒,慢放',s:'4×12-15'},
   {n:'小腿提踵',t:'孤立',g:'小腿三头肌',p:'站垫边,全程拉伸,顶峰收1秒',s:'4×15-20'}
  ],
+ '臀':[
+  {n:'杠铃臀推',t:'复合',g:'臀大肌',p:'肩胛靠凳,杠铃放髋,顶至肩髋膝一线,顶峰夹臀1秒',s:'4×10-12'},
+  {n:'臀桥',t:'复合',g:'臀大肌/腘绳',p:'脚距肩宽,顶髋至肩膝一线,慢放控,别塌腰',s:'4×12-15'},
+  {n:'蚌式开合',t:'孤立',g:'臀中肌',p:'侧卧屈膝,上膝外展如蚌壳,骨盆稳定不晃',s:'3×15-20'},
+  {n:'侧卧抬腿',t:'孤立',g:'臀中肌/臀小肌',p:'侧躺腿伸直微前倾,上抬控速,别翻髋',s:'3×15-20'},
+  {n:'保加利亚分腿蹲',t:'复合',g:'股四/臀',p:'后脚搭凳,前腿下蹲至90,重心压前脚',s:'3×10-12'}
+ ],
  '核心':[
   {n:'平板支撑',t:'自重',g:'核心稳定',p:'身体一条线,收腹,别塌腰翘臀',s:'4×30-60秒'},
   {n:'卷腹',t:'自重',g:'腹直肌上部',p:'下腰贴地,只肩胛离地,别拽颈',s:'4×15-20'},
@@ -1008,7 +1015,8 @@ function bodySVG(hi){
   const B={
     '背':'<ellipse cx="50" cy="54" rx="14" ry="22"/>',
     '三头':'<ellipse cx="18" cy="54" rx="5" ry="12" transform="rotate(10 18 54)"/><ellipse cx="82" cy="54" rx="5" ry="12" transform="rotate(-10 82 54)"/>',
-    '腿':'<rect x="37" y="88" width="9" height="64" rx="5"/><rect x="54" y="88" width="9" height="64" rx="5"/>'
+    '腿':'<rect x="37" y="88" width="9" height="64" rx="5"/><rect x="54" y="88" width="9" height="64" rx="5"/>',
+    '臀':'<ellipse cx="41" cy="83" rx="9" ry="8"/><ellipse cx="59" cy="83" rx="9" ry="8"/>'
   };
   const hlStyle='fill="rgba(224,122,95,0.72)" stroke="#c05e45" stroke-width="2"';
   const wrap=(body,label)=>`<div class="bv"><svg viewBox="0 0 100 170" style="width:88px;height:150px">${outline}${body?`<g ${hlStyle}>${body}</g>`:''}</svg><div class="lbl">${label}</div></div>`;
@@ -1050,7 +1058,7 @@ function initTrain(){
  $('#tr-date').value=today();
  const ps=$('#tr-part');PARTS.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o)});
  const chips=$('#lib-chips');PARTS.forEach((p,i)=>{const b=document.createElement('button');b.className='chip'+(i===0?' active':'');b.textContent=p;b.onclick=()=>{chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');renderLib(p)};chips.appendChild(b)});
- const sel=$('#plan-focus');['胸','背','肩','二头','三头','腿','核心','全身(推)','全身(拉)','全身(腿)'].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
+ const sel=$('#plan-focus');['胸','背','肩','二头','三头','腿','臀','核心','全身(推)','全身(拉)','全身(腿)'].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
  renderLib(PARTS[0]);
  renderHistory();
  if(builder.length===0)addRow();
