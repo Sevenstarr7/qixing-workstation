@@ -66,9 +66,8 @@ h2{font-family:'ZCOOL KuaiLe',cursive;font-size:20px;margin:0 0 10px;font-weight
 h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
 .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
 .view{display:none}
-.view.active{display:block;animation:softIn .26s ease-out both}
+.view.active{display:block}
 .view.active.pop{animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes softIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
@@ -955,7 +954,11 @@ const miniCat=(fill,stroke='#3a2820')=>{
 </svg>`;};
 
 /* ===== 视图切换 ===== */
+const scrollPos={};
 function go(v,back){
+  const cur=document.querySelector('.view.active');
+  const curId=cur?cur.id.replace('view-',''):null;
+  if(curId)scrollPos[curId]=window.scrollY;
   document.querySelectorAll('.view').forEach(e=>{
     e.classList.toggle('active',e.id==='view-'+v);
     e.classList.remove('pop');
@@ -963,11 +966,15 @@ function go(v,back){
   document.querySelectorAll('.bottomnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===v));
   const t=document.getElementById('view-'+v);
   if(t&&!back)t.classList.add('pop');
-  window.scrollTo(0,0);
-  if(v==='stock')loadStockFeed();
-  if(v==='news')loadFeed();
-  if(v==='mine')loadReflection();
-  if(v==='saved')renderSavedLists();
+  if(back){
+    window.scrollTo(0,scrollPos[v]||0);
+  }else{
+    window.scrollTo(0,0);
+    if(v==='stock')loadStockFeed();
+    if(v==='news')loadFeed();
+    if(v==='mine')loadReflection();
+    if(v==='saved')renderSavedLists();
+  }
 }
 
 /* ===== 数据：动作库 ===== */
