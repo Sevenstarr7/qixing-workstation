@@ -707,6 +707,15 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
         <div class="sec-head"><h3>📜 历史记录</h3><span class="badge mint" id="train-streak">连续 0 天</span></div>
         <div id="history" style="margin-top:8px"></div>
       </div>
+      <div class="card">
+        <div class="sec-head"><h3>☁️ 云端备份</h3><span class="badge" id="sync-badge">未配置</span></div>
+        <div class="sm muted" id="sync-status" style="margin:4px 0 8px">粘贴 GitHub Token 后，保存训练会自动同步到私有仓库，删图标/换机都不丢。</div>
+        <input id="gh-token" type="password" placeholder="粘贴 GitHub Token（ghp_… 或 fine-grained）" style="margin-bottom:8px">
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost sm" style="flex:1" onclick="saveToken()">保存 Token</button>
+          <button class="btn ghost sm" style="flex:1" onclick="syncNow()">立即同步</button>
+        </div>
+      </div>
     </div>
 
     <div id="panel-lib" style="display:none">
@@ -1123,9 +1132,42 @@ function saveSession(){
  accumulateEx(exs,part);
  builder=[];addRow();$('#tr-part').value='';
  renderHistory();updateHome();updateTrainStreak();
+ syncToCloud();
  confetti(['💪','🔥','✨','🏋️']);
  alert('✅ 已保存 '+exs.length+' 个动作');
 }
+/* ===== 云端同步（私有仓库 qx-userdata）===== */
+const DATA_REPO='Sevenstarr7/qx-userdata';
+function getTok(){return ls('qx_github_token','')}
+async function saveToken(){const v=$('#gh-token').value.trim();if(!v){alert('先粘贴 GitHub Token');return}lsSet('qx_github_token',v);$('#gh-token').value='';updateSyncBadge();await syncFromCloud();await syncToCloud();}
+function updateSyncBadge(){const b=$('#sync-badge');if(!b)return;if(getTok()){b.textContent='已配置';b.className='badge mint'}else{b.textContent='未配置';b.className='badge'}}
+function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
+function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
+function b64d(s){return decodeURIComponent(escape(atob(s)))}
+async function syncToCloud(){
+ const tok=getTok();if(!tok)return;const st=$('#sync-status');
+ try{
+  const data=collectUserdata();const content=b64e(JSON.stringify(data));let sha=null;
+  const r=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
+  if(r.status===200){const j=await r.json();sha=j.sha}
+  const body={message:'sync userdata '+new Date().toISOString(),content};if(sha)body.sha=sha;
+  const up=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+  if(st){if(up.status===200||up.status===201)st.textContent='☁️ 已同步 '+new Date().toLocaleString();else st.textContent='同步失败('+up.status+')，检查 token 权限'}
+ }catch(e){if(st)st.textContent='同步出错：'+e.message}
+ updateSyncBadge();
+}
+async function syncFromCloud(){
+ const tok=getTok();if(!tok)return;const st=$('#sync-status');
+ try{
+  const r=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
+  if(r.status!==200)return;const j=await r.json();const data=JSON.parse(b64d(j.content));
+  if(!data.savedAt)return;const localSaved=Number(ls('qx_sync_saved','0'));
+  if(data.savedAt>=localSaved){Object.keys(data).forEach(k=>{if(k==='savedAt')return;lsSet(k,data[k])});lsSet('qx_sync_saved',String(data.savedAt));sessions=ls('qx_sessions',[]);renderHistory();updateHome();updateTrainStreak();if(st)st.textContent='☁️ 已从云端恢复 '+new Date(data.savedAt).toLocaleString();}
+ }catch(e){}
+ updateSyncBadge();
+}
+function syncNow(){updateSyncBadge();syncToCloud()}
+
 function renderHistory(){
  const el=$('#history');
  if(!sessions.length){el.innerHTML=`<div class="empty">${catNap}还没有记录，私教课或自练后来记一笔</div>`;return}
@@ -1191,7 +1233,7 @@ function genPlan(){
   ${picks.map((e,i)=>`<div class="plan-item"><div class="check ${done.includes(i)?'on':''}" onclick="togglePlan(${i})">${done.includes(i)?'✓':''}</div><div><b>${esc(e.n)}</b><div class="sm muted">${esc(e.g)} · ${esc(e.s)}</div></div></div>`).join('')}
   <button class="btn ghost sm" style="margin-top:8px;width:auto" onclick="loadPlanToBuilder()">把这组载入今日记录</button>`:`<div class="empty">${catNap}选一个部位开始</div>`;
 }
-function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.indexOf(i);if(idx>=0)d.splice(idx,1);else d.push(i);lsSet(k,d);genPlan()}
+function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.indexOf(i);if(idx>=0)d.splice(idx,1);else d.push(i);lsSet(k,d);genPlan();syncToCloud()}
 function loadPlanToBuilder(){const f=$('#plan-focus').value;let picks=[];if(f.startsWith('全身')){if(f.includes('推'))picks=[...EX['胸'].slice(0,2),EX['肩'][0],EX['三头'][0]];else if(f.includes('拉'))picks=[...EX['背'].slice(0,2),EX['二头'][0],EX['背'][4]];else if(f.includes('腿'))picks=[...EX['腿'].slice(0,3),EX['核心'][0]];else picks=[EX['胸'][0],EX['背'][0],EX['肩'][0],EX['腿'][0],EX['核心'][0]]}else if(EX[f])picks=EX[f].slice(0,5);builder=picks.map(e=>({n:e.n,sets:'',reps:'',wt:'',rpe:''}));if($('#tr-part').value==='')$('#tr-part').value=f.startsWith('全身')?'':f;trainTab('record');renderBuilder()}
 
 /* ===== 统一内容卡片 ===== */
@@ -1462,7 +1504,7 @@ function initThemeSwitcher(){
 }
 
 /* ===== 启动 ===== */
-initTrain();initStock();initThemeSwitcher();updateHome();
+initTrain();initStock();initThemeSwitcher();updateHome();updateSyncBadge();syncFromCloud();
 if('serviceWorker' in navigator){/* v4 暂不注册 SW */}
 </script>
 </body>
