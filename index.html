@@ -1294,7 +1294,7 @@ const artKey=a=>(a.cat||'')+'|'+(a.t||'');
 const hasLiked=a=>liked.some(x=>artKey(x)===artKey(a));
 const hasSaved=a=>saved.some(x=>artKey(x)===artKey(a));
 function artCard(a){
-  const ds=encodeURIComponent(JSON.stringify({c:a.cat,t:a.t,s:a.s,link:a.link,tag:a.tag}));
+  const ds=encodeURIComponent(JSON.stringify({c:a.cat,t:a.t,s:a.s,link:a.link,tag:a.tag})).replace(/'/g,'%27');
   const lk=hasLiked(a),sv=hasSaved(a);
   const tc=a.tag&&(a.tag.includes('二创')||a.tag.includes('种草'))?'gold':'mint';
   const hasLink=a.link&&a.link!=='#';
@@ -1324,12 +1324,12 @@ function artClick(ds,act){
     lsSet('qx_saved',saved);
   }else if(act==='share'){
     const txt=`【${a.c||''}】${a.t}\n${a.s||''}`+(a.link&&a.link!=='#'?`\n${a.link}`:'');
-    if(navigator.share){navigator.share({title:a.t,text:txt,url:a.link&&a.link!=='#'?a.link:''}).catch(()=>{})}
-    else{navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>alert('已复制，去微信粘贴给朋友讨论')):prompt('复制分享内容：',txt)}
+    const fallback=()=>{if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>alert('已复制，去微信粘贴给朋友讨论')).catch(()=>prompt('复制分享内容：',txt))}else{prompt('复制分享内容：',txt)}};
+    if(navigator.share){navigator.share({title:a.t,text:txt,url:a.link&&a.link!=='#'?a.link:''}).catch(fallback)}else{fallback()}
     return;
   }
-  if($('#view-news').classList.contains('active'))renderNews();
-  /* 散户板块用自身 stockCard，不经过 artClick 的赞/藏/分享 */
+  renderNews();
+  /* renderNews 会同时刷新 news-list 与 pet-list 及统计；散户板块用自身 stockCard，不经过 artClick */
   updateHome();
 }
 function savedItemCard(x,idx,isLike){
