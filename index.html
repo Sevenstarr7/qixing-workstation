@@ -65,9 +65,9 @@ h1{font-family:'ZCOOL KuaiLe',cursive;font-size:28px;margin:0 0 4px;font-weight:
 h2{font-family:'ZCOOL KuaiLe',cursive;font-size:20px;margin:0 0 10px;font-weight:400}
 h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
 .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
-.view{display:none;animation:fadeIn .22s ease-out}
-.view.active{display:block}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.view{display:none}
+.view.active{display:block;animation:softIn .26s ease-out both}
+@keyframes softIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
