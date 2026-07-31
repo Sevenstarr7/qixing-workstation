@@ -65,9 +65,9 @@ h1{font-family:'ZCOOL KuaiLe',cursive;font-size:28px;margin:0 0 4px;font-weight:
 h2{font-family:'ZCOOL KuaiLe',cursive;font-size:20px;margin:0 0 10px;font-weight:400}
 h3{font-family:'ZCOOL KuaiLe',cursive;font-size:17px;margin:0;font-weight:400}
 .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
-.view{display:none;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+.view{display:none;animation:fadeIn .22s ease-out}
 .view.active{display:block}
-@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
@@ -1372,7 +1372,7 @@ function unlikeItem(idx){liked.splice(idx,1);lsSet('qx_liked',liked);renderNews(
 /* ===== 资讯 ===== */
 let NEWS_FEED=null,PET_FEED=null,feedLoaded=false;
 async function loadFeed(){
- if(feedLoaded){renderNews();return}
+ if(feedLoaded){updateSavedCounts();return}
  feedLoaded=true;
  try{const r=await fetch('feed.json?_='+Date.now());if(r.ok){const d=await r.json();if(Array.isArray(d)&&d.length)NEWS_FEED=d}}catch(e){}
  try{const r2=await fetch('pet.json?_='+Date.now());if(r2.ok){const d2=await r2.json();if(Array.isArray(d2)&&d2.length)PET_FEED=d2}}catch(e){}
@@ -1408,11 +1408,14 @@ function renderSavedLists(){
  }
  $(target).innerHTML=matched.map(o=>savedItemCard(o.x,o.i,isLike)).join('');
 }
-function renderNews(){
+function updateSavedCounts(){
  $('#saved-cnt').textContent=saved.length;
  $('#liked-cnt').textContent=liked.length;
  $('#fav-total').textContent='⭐ '+saved.length+' · 👍 '+liked.length;
  const e1=$('#entry-saved-cnt'),e2=$('#entry-liked-cnt');if(e1)e1.textContent=saved.length;if(e2)e2.textContent=liked.length;
+}
+function renderNews(){
+ updateSavedCounts();
  renderSavedLists();
  $('#news-list').innerHTML=(NEWS_FEED||NEWS).map(g=>`<div style="margin-bottom:14px"><div class="row between" style="margin:0 4px 12px"><b style="font-size:15px;color:var(--ink2)">${esc(g.cat)}</b></div>${g.items.map(i=>artCard({cat:g.cat,mod:'news',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('')}</div>`).join('');
  $('#pet-list').innerHTML=(PET_FEED||PET).map(i=>artCard({cat:'宠物',mod:'pet',t:i.t,s:i.s,link:i.link||'#',tag:i.tag||''})).join('');
