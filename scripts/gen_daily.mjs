@@ -16,17 +16,46 @@ if (!API_KEY) {
 async function callLLM(system, user, retries = 3) {
   // 兜底提取：模型可能返回 markdown 围栏、前后缀说明、甚至截断的 JSON，
   // 这里依次尝试：去围栏→贪心匹配 [..]→匹配 {..}→首尾切片。任一成功即返回。
+  function extractArray(text) {
+    const start = text.indexOf('[');
+    if (start === -1) return null;
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '[') depth++;
+      else if (ch === ']') { depth--; if (depth === 0) return text.slice(start, i + 1); }
+    }
+    return null;
+  }
+  function extractObject(text) {
+    const start = text.indexOf('{');
+    if (start === -1) return null;
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') depth++;
+      else if (ch === '}') { depth--; if (depth === 0) return text.slice(start, i + 1); }
+    }
+    return null;
+  }
   function extractJSON(text) {
     const cleaned = String(text || '')
       .replace(/```json\s*/gi, '')
       .replace(/```/g, '')
       .trim();
-    let m = cleaned.match(/\[[\s\S]*\]\s*$/); // 完整 JSON 数组
-    if (m) return JSON.parse(m[0]);
-    m = cleaned.match(/\{[\s\S]*\}\s*$/); // 完整 JSON 对象
-    if (m) return JSON.parse(m[0]);
-    const s = cleaned.indexOf('['), e = cleaned.lastIndexOf(']');
-    if (s !== -1 && e > s) return JSON.parse(cleaned.slice(s, e + 1));
+    // 括号平衡提取：忽略 search 模型末尾的 [1]: {"url":...} 引用脚注
+    const arr = extractArray(cleaned);
+    if (arr) return JSON.parse(arr);
+    const obj = extractObject(cleaned);
+    if (obj) return JSON.parse(obj);
     throw new Error('响应中找不到合法 JSON');
   }
 
@@ -100,16 +129,20 @@ async function validateLinks(arr) {
 async function main() {
   console.log(`[start] ${TODAY} | base=${BASE_URL} | model=${MODEL}`);
 
-  const feedSys = '你是资深科技/产品资讯编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
+  const feedSys = '你是资深科技/产品资讯编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
   const feedUser = `生成今天(${TODAY})的资讯，5 个分类 [AI, 电商, 产品经理, 跨境DTC, 产品sense]，每类 3 条，共 15 条。
-每一条格式:{ "t": 标题(20-30字), "s": 摘要(280-420字,客观、有信息量、含数据或因果), "link": 真实可访问的 URL(官方/权威媒体,必须真实存在且能打开), "tag": 2-4 个关键词用/分隔 }。
-要求：link 必须真实，严禁占位符或编造域名；内容围绕当天或近期真实发生的事件/趋势。
+每一条格式:{ "t": 标题(20-30字), "s": 摘要(280-420字,客观、有信息量、含数据或因果), "link": 真实可访问的 URL, "tag": 2-4 个关键词用/分隔 }。
+要求：
+1) link 必须填写你通过联网搜索实际检索到的真实网页 URL（来自搜索结果的来源链接），不要用训练记忆编造；若确实找不到可靠来源可填 "#"。
+2) 内容围绕当天或近期真实发生的事件/趋势，禁止虚构未发生的事件。
 【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{ "cat": "AI", "items": [ {t,s,link,tag}, ... ] }, ... ]`;
 
-  const petSys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
+  const petSys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
   const petUser = `生成今天(${TODAY})的宠物内容情报 12 条，紧扣赛道：老年犬关节保养、猫咪泌尿、老年猫犬日常护理、宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)。
-每一条格式:{ "t": 标题(18-28字), "s": 摘要(280-420字,客观、有数据或案例), "link": 真实可访问的 URL(行业媒体/官方/平台,必须真实存在), "tag": 2-4 个关键词用/分隔 }。
-要求：link 必须真实；内容有料，别水。
+每一条格式:{ "t": 标题(18-28字), "s": 摘要(280-420字,客观、有数据或案例), "link": 真实可访问的 URL, "tag": 2-4 个关键词用/分隔 }。
+要求：
+1) link 必须填写你通过联网搜索实际检索到的真实网页 URL（来自搜索结果的来源链接），不要用训练记忆编造；若确实找不到可靠来源可填 "#"。
+2) 内容有料、真实，别水。
 【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{t,s,link,tag}, ...]`;
 
   const feed = await callLLM(feedSys, feedUser);
