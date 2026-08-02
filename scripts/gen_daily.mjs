@@ -14,6 +14,22 @@ if (!API_KEY) {
 }
 
 async function callLLM(system, user, retries = 3) {
+  // 兜底提取：模型可能返回 markdown 围栏、前后缀说明、甚至截断的 JSON，
+  // 这里依次尝试：去围栏→贪心匹配 [..]→匹配 {..}→首尾切片。任一成功即返回。
+  function extractJSON(text) {
+    const cleaned = String(text || '')
+      .replace(/```json\s*/gi, '')
+      .replace(/```/g, '')
+      .trim();
+    let m = cleaned.match(/\[[\s\S]*\]\s*$/); // 完整 JSON 数组
+    if (m) return JSON.parse(m[0]);
+    m = cleaned.match(/\{[\s\S]*\}\s*$/); // 完整 JSON 对象
+    if (m) return JSON.parse(m[0]);
+    const s = cleaned.indexOf('['), e = cleaned.lastIndexOf(']');
+    if (s !== -1 && e > s) return JSON.parse(cleaned.slice(s, e + 1));
+    throw new Error('响应中找不到合法 JSON');
+  }
+
   for (let i = 0; i < retries; i++) {
     try {
       const res = await fetch(`${BASE_URL}/chat/completions`, {
@@ -21,7 +37,8 @@ async function callLLM(system, user, retries = 3) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
         body: JSON.stringify({
           model: MODEL,
-          temperature: 0.7,
+          temperature: 0.5,                 // 降温度，减少 JSON 抖
+          max_tokens: 4096,                 // 中文摘要要够长，默认 1024 不够
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -31,11 +48,11 @@ async function callLLM(system, user, retries = 3) {
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
       const data = await res.json();
       const content = data?.choices?.[0]?.message?.content || '';
-      // 提取首个 { 到末个 } 之间的 JSON，兼容模型前面/后面带废话的情况
-      const start = content.indexOf('{');
-      const end = content.lastIndexOf('}');
-      if (start === -1 || end === -1) throw new Error('响应中未找到 JSON');
-      return JSON.parse(content.slice(start, end + 1));
+      try {
+        return extractJSON(content);
+      } catch (parseErr) {
+        throw new Error(`JSON 解析失败: ${parseErr.message} | 原文头200字: ${String(content).slice(0, 200)}`);
+      }
     } catch (e) {
       console.log(`[retry ${i + 1}/${retries}] LLM 调用失败: ${e.message}`);
       if (i === retries - 1) throw e;
@@ -83,17 +100,17 @@ async function validateLinks(arr) {
 async function main() {
   console.log(`[start] ${TODAY} | base=${BASE_URL} | model=${MODEL}`);
 
-  const feedSys = '你是资深科技/产品资讯编辑。只输出 JSON，不要任何解释文字。';
+  const feedSys = '你是资深科技/产品资讯编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
   const feedUser = `生成今天(${TODAY})的资讯，5 个分类 [AI, 电商, 产品经理, 跨境DTC, 产品sense]，每类 3 条，共 15 条。
 每一条格式:{ "t": 标题(20-30字), "s": 摘要(280-420字,客观、有信息量、含数据或因果), "link": 真实可访问的 URL(官方/权威媒体,必须真实存在且能打开), "tag": 2-4 个关键词用/分隔 }。
 要求：link 必须真实，严禁占位符或编造域名；内容围绕当天或近期真实发生的事件/趋势。
-只输出 JSON 数组，结构:[ { "cat": "AI", "items": [ {t,s,link,tag}, ... ] }, ... ]。`;
+【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{ "cat": "AI", "items": [ {t,s,link,tag}, ... ] }, ... ]`;
 
-  const petSys = '你是宠物行业内容编辑。只输出 JSON，不要任何解释文字。';
+  const petSys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
   const petUser = `生成今天(${TODAY})的宠物内容情报 12 条，紧扣赛道：老年犬关节保养、猫咪泌尿、老年猫犬日常护理、宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)。
 每一条格式:{ "t": 标题(18-28字), "s": 摘要(280-420字,客观、有数据或案例), "link": 真实可访问的 URL(行业媒体/官方/平台,必须真实存在), "tag": 2-4 个关键词用/分隔 }。
 要求：link 必须真实；内容有料，别水。
-只输出 JSON 数组，结构:[ {t,s,link,tag}, ... ]。`;
+【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{t,s,link,tag}, ...]`;
 
   const feed = await callLLM(feedSys, feedUser);
   const pet = await callLLM(petSys, petUser);
