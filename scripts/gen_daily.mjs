@@ -61,18 +61,23 @@ async function callLLM(system, user, retries = 3) {
 
   for (let i = 0; i < retries; i++) {
     try {
+      // search-preview 模型（如 gpt-4o-mini-search-preview）不接受自定义 temperature，
+      // 传了会报 "Model incompatible request argument supplied: temperature"。
+      // 它用默认 temperature=1，JSON 抖动略大，靠括号平衡提取+硬 prompt 约束兜底。
+      const isSearchModel = /search/i.test(MODEL);
+      const body = {
+        model: MODEL,
+        max_tokens: 4096,                 // 中文摘要要够长，默认 1024 不够
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+      };
+      if (!isSearchModel) body.temperature = 0.5;   // 普通 chat 模型降温度减少 JSON 抖
       const res = await fetch(`${BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-        body: JSON.stringify({
-          model: MODEL,
-          temperature: 0.5,                 // 降温度，减少 JSON 抖
-          max_tokens: 4096,                 // 中文摘要要够长，默认 1024 不够
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
       const data = await res.json();
