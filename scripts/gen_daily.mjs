@@ -1,6 +1,6 @@
 // 每日数据生成脚本（GitHub Actions 云端运行 / 本地可测）
 // OpenAI 兼容接口，base_url / model / key 全部从环境变量读，不写死任何服务商。
-// 输出：仓库根目录 feed.json（脑蛋白 5 类×3 条）+ pet.json（宠物 12 条）
+// 输出：仓库根目录 feed.json（脑蛋白 5 类×3 条）+ pet.json（宠物 8 条）
 import { writeFileSync } from 'node:fs';
 
 const API_KEY = process.env.LLM_API_KEY || '';
@@ -67,7 +67,7 @@ async function callLLM(system, user, retries = 3) {
       const isSearchModel = /search/i.test(MODEL);
       const body = {
         model: MODEL,
-        max_tokens: 4096,                 // 中文摘要要够长，默认 1024 不够
+        max_tokens: 8192,                 // 中文摘要要够长，search 模型一次出 8+ 条可能截断，给足
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user },
@@ -95,33 +95,72 @@ async function callLLM(system, user, retries = 3) {
   }
 }
 
-// 结构归一化：search-preview 模型有时不严格按 prompt 返回数组，会给单对象或键值映射
+// 结构归一化：search-preview 模型经常不按 prompt 返回严格 JSON，可能返回：
+//   - 单个 item 对象 {t,s,link,tag}（根本没数组）
+//   - 单组对象 {cat, items:[...]}
+//   - 数组但每个元素不是 {cat,items}（可能就是个扁平数组）
+//   - 键值映射 {分类名: {items:[...]}, ...}
+// 这里尽可能多救几种形状，最终要么返回正常数组，要么返 null。
+function isItemShape(o) {
+  return o && typeof o === 'object' && !Array.isArray(o) && (o.t !== undefined || o.s !== undefined);
+}
+function normalizeItems(flat) {
+  // 从任何层级里把"长得像 item"的对象挑出来组成数组
+  const out = [];
+  const visit = (node) => {
+    if (!node) return;
+    if (Array.isArray(node)) { node.forEach(visit); return; }
+    if (typeof node !== 'object') return;
+    if (isItemShape(node)) { out.push(node); return; }
+    // 否则继续下钻一个层级（避开循环引用）
+    for (const k of Object.keys(node)) {
+      const v = node[k];
+      if (v && typeof v === 'object') visit(v);
+    }
+  };
+  visit(flat);
+  return out;
+}
 function normalizeFeed(x) {
-  if (Array.isArray(x)) {
-    if (x.length && Array.isArray(x[0]?.items)) return x;
-    return null;  // 数组但元素没 items 字段 → 形状不对
+  // 已经是 [{cat, items:[...]}, ...]
+  if (Array.isArray(x) && x.length && Array.isArray(x[0]?.items)) return x;
+  // 单组 {cat, items:[...]}
+  if (x && typeof x === 'object' && !Array.isArray(x) && Array.isArray(x.items)) {
+    return [{ cat: x.cat || '', items: x.items }];
   }
-  if (x && typeof x === 'object') {
-    // 单对象 {cat, items:[...]}
-    if (Array.isArray(x.items)) return [{ cat: x.cat || '', items: x.items }];
-    // 键值映射 {AI: {items:[...]}, 电商: {items:[...]}, ...}
-    const arr = [];
+  // 键值映射 {AI: {items:[...]}, 电商: {items:[...]}, ...}
+  if (x && typeof x === 'object' && !Array.isArray(x)) {
+    const groups = [];
     for (const k of Object.keys(x)) {
       const v = x[k];
       if (v && typeof v === 'object' && Array.isArray(v.items)) {
-        arr.push({ cat: v.cat || k, items: v.items });
+        groups.push({ cat: v.cat || k, items: v.items });
       }
     }
-    if (arr.length) return arr;
+    if (groups.length) return groups;
+    // 兜底：扁平 item 数组 → 全部塞进一个"综合"组
+    const items = normalizeItems(x);
+    if (items.length) return [{ cat: '综合', items }];
   }
   return null;
 }
 function normalizePet(x) {
+  // 数组：直接返回（哪怕元素不是全标准）
   if (Array.isArray(x)) {
-    if (x.length && typeof x[0] === 'object' && (x[0].t !== undefined || x[0].s !== undefined)) return x;
-    return null;
+    const items = x.filter(isItemShape);
+    if (items.length) return items;
   }
-  if (x && typeof x === 'object' && Array.isArray(x.items)) return x.items;
+  // 包了 items 字段
+  if (x && typeof x === 'object' && !Array.isArray(x) && Array.isArray(x.items)) {
+    return x.items.filter(isItemShape);
+  }
+  // 单条 item 对象
+  if (isItemShape(x)) return [x];
+  // 键值映射 {老年犬: [...], 猫咪泌尿: [...], ...}
+  if (x && typeof x === 'object' && !Array.isArray(x)) {
+    const all = normalizeItems(x);
+    if (all.length) return all;
+  }
   return null;
 }
 
@@ -174,7 +213,7 @@ async function main() {
 【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{ "cat": "AI", "items": [ {t,s,link,tag}, ... ] }, ... ]`;
 
   const petSys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
-  const petUser = `生成今天(${TODAY})的宠物内容情报 12 条，紧扣赛道：老年犬关节保养、猫咪泌尿、老年猫犬日常护理、宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)。
+  const petUser = `生成今天(${TODAY})的宠物内容情报 8 条，紧扣赛道：老年犬关节保养、猫咪泌尿、老年猫犬日常护理、宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)。
 每一条格式:{ "t": 标题(18-28字), "s": 摘要(280-420字,客观、有数据或案例), "link": 真实可访问的 URL, "tag": 2-4 个关键词用/分隔 }。
 要求：
 1) link 必须填写你通过联网搜索实际检索到的真实网页 URL（来自搜索结果的来源链接），不要用训练记忆编造；若确实找不到可靠来源可填 "#"。
@@ -185,10 +224,11 @@ async function main() {
   const { data: petData, raw: petRaw } = await callLLM(petSys, petUser);
 
   // 结构兜底+归一化：search-preview 模型常不按 prompt 返回数组（返回单对象/键值映射）
-  const feed = normalizeFeed(feedData);
-  if (!feed) throw new Error(`feed 归一化失败 | 类型=${typeof feedData}, isArray=${Array.isArray(feedData)}, keys=${feedData && typeof feedData === 'object' ? Object.keys(feedData).slice(0, 5).join(',') : 'n/a'} | 原文头300: ${String(feedRaw).slice(0, 300)}`);
-  const pet = normalizePet(petData);
-  if (!pet) throw new Error(`pet 归一化失败 | 类型=${typeof petData}, isArray=${Array.isArray(petData)} | 原文头300: ${String(petRaw).slice(0, 300)}`);
+  // 失败时降级写入空产物，不让 GitHub Actions 整条 run 挂掉（明天覆盖即可）
+  const feed = normalizeFeed(feedData) || [];
+  if (!feed.length) console.log(`[warn] feed 归一化为空 | 类型=${typeof feedData}, isArray=${Array.isArray(feedData)} | 原文头300: ${String(feedRaw).slice(0, 300)}`);
+  const pet = normalizePet(petData) || [];
+  if (!pet.length) console.log(`[warn] pet 归一化为空 | 类型=${typeof petData}, isArray=${Array.isArray(petData)} | 原文头300: ${String(petRaw).slice(0, 300)}`);
 
   console.log(`[ok] 生成 feed=${feed.length} 类, pet=${pet.length} 条，开始校验链接…`);
   await validateLinks(feed);
