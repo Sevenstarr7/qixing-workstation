@@ -1,6 +1,7 @@
 // 每日数据生成脚本（GitHub Actions 云端运行 / 本地可测）
 // OpenAI 兼容接口，base_url / model / key 全部从环境变量读，不写死任何服务商。
-// 输出：仓库根目录 feed.json（脑蛋白 5 类×3 条）+ pet.json（宠物 8 条）
+// 输出：仓库根目录 feed.json（脑蛋白 5 类×5 条）+ pet.json（宠物拆 2 次×5 条，去重后最多 10 条）
+// 架构：search 模型单次稳定出 3-5 条，故 feed 每类独立调用、pet 分两段调用，避免一次大 prompt 截断/吞类
 import { writeFileSync } from 'node:fs';
 
 const API_KEY = process.env.LLM_API_KEY || '';
@@ -201,42 +202,92 @@ async function validateLinks(arr) {
   });
 }
 
-async function main() {
-  console.log(`[start] ${TODAY} | base=${BASE_URL} | model=${MODEL}`);
+// 去重：按标题去重（避免 refill 补来的重复）
+function dedupeItems(arr) {
+  const seen = new Set();
+  return (arr || []).filter((it) => {
+    const key = (it?.t || '').trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
-  const feedSys = '你是资深科技/产品资讯编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
-  const feedUser = `生成今天(${TODAY})的资讯，5 个分类 [AI, 电商, 产品经理, 跨境DTC, 产品sense]，每类 3 条，共 15 条。
+// 一次 LLM 调用 → 归一化成 item 数组（适配 search 模型的单条/数组/键值映射形状）
+async function genItems(system, user) {
+  const { data, raw } = await callLLM(system, user);
+  const items = normalizePet(data) || [];
+  if (!items.length) console.log(`[warn] 该次返回为空 | 原文头200: ${String(raw).slice(0, 200)}`);
+  return items;
+}
+
+// search-preview 单次最多稳定出 3-5 条；一类一次拿 5 条，不够 3 条自动补一次（去重合并）
+async function genCategoryFeed(cat) {
+  const sys = '你是资深科技/产品资讯编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
+  const usr = `生成今天(${TODAY})的"${cat}"分类资讯 5 条。
 每一条格式:{ "t": 标题(20-30字), "s": 摘要(280-420字,客观、有信息量、含数据或因果), "link": 真实可访问的 URL, "tag": 2-4 个关键词用/分隔 }。
 要求：
 1) link 必须填写你通过联网搜索实际检索到的真实网页 URL（来自搜索结果的来源链接），不要用训练记忆编造；若确实找不到可靠来源可填 "#"。
 2) 内容围绕当天或近期真实发生的事件/趋势，禁止虚构未发生的事件。
-【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{ "cat": "AI", "items": [ {t,s,link,tag}, ... ] }, ... ]`;
+【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{t,s,link,tag}, ...]`;
+  let items = await genItems(sys, usr);
+  if (items.length < 3) {
+    console.log(`[refill] ${cat} 首批 ${items.length} 条，补一次`);
+    const more = await genItems(sys, usr + '\n\n(补充：刚才没出够 5 条，请再给 5 条不同内容)');
+    items = dedupeItems(items.concat(more)).slice(0, 5);
+  }
+  return { cat, items: items.slice(0, 5) };
+}
 
-  const petSys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
-  const petUser = `生成今天(${TODAY})的宠物内容情报 8 条，紧扣赛道：老年犬关节保养、猫咪泌尿、老年猫犬日常护理、宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)。
+// 宠物情报拆 2 次（每次 5 条），按赛道切分，合并去重
+async function genPetSlice(hint) {
+  const sys = '你是宠物行业内容编辑。严格规则：你的回复必须且只能是合法的 JSON 数组，禁止任何前缀/后缀文字、自然语言说明、markdown 围栏（```）、注释、代码块标签。严禁输出引用标记（如 [1]、[1]: url、[citation]）、脚注、来源列表、或 JSON 之外的任何附加内容。开头第一个字符必须是 [，结尾最后一个字符必须是 ]。若违反，整个回复作废。';
+  const usr = `生成今天(${TODAY})的宠物内容情报 5 条，紧扣赛道：${hint}。
 每一条格式:{ "t": 标题(18-28字), "s": 摘要(280-420字,客观、有数据或案例), "link": 真实可访问的 URL, "tag": 2-4 个关键词用/分隔 }。
 要求：
 1) link 必须填写你通过联网搜索实际检索到的真实网页 URL（来自搜索结果的来源链接），不要用训练记忆编造；若确实找不到可靠来源可填 "#"。
 2) 内容有料、真实，别水。
 【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{t,s,link,tag}, ...]`;
+  let items = await genItems(sys, usr);
+  if (items.length < 3) {
+    console.log(`[refill] 宠物(${hint}) 首批 ${items.length} 条，补一次`);
+    const more = await genItems(sys, usr + '\n\n(补充：刚才没出够 5 条，请再给 5 条不同内容)');
+    items = dedupeItems(items.concat(more)).slice(0, 5);
+  }
+  return items.slice(0, 5);
+}
 
-  const { data: feedData, raw: feedRaw } = await callLLM(feedSys, feedUser);
-  const { data: petData, raw: petRaw } = await callLLM(petSys, petUser);
+async function main() {
+  console.log(`[start] ${TODAY} | base=${BASE_URL} | model=${MODEL}`);
 
-  // 结构兜底+归一化：search-preview 模型常不按 prompt 返回数组（返回单对象/键值映射）
-  // 失败时降级写入空产物，不让 GitHub Actions 整条 run 挂掉（明天覆盖即可）
-  const feed = normalizeFeed(feedData) || [];
-  if (!feed.length) console.log(`[warn] feed 归一化为空 | 类型=${typeof feedData}, isArray=${Array.isArray(feedData)} | 原文头300: ${String(feedRaw).slice(0, 300)}`);
-  const pet = normalizePet(petData) || [];
-  if (!pet.length) console.log(`[warn] pet 归一化为空 | 类型=${typeof petData}, isArray=${Array.isArray(petData)} | 原文头300: ${String(petRaw).slice(0, 300)}`);
+  // feed：5 个分类，每个分类单独一次调用拿 5 条（search 模型单次稳定上限约 3-5 条）
+  const cats = ['AI', '电商', '产品经理', '跨境DTC', '产品sense'];
+  const feed = [];
+  for (const cat of cats) {
+    const g = await genCategoryFeed(cat);
+    feed.push(g);
+    console.log(`[feed] ${cat}: ${g.items.length} 条`);
+  }
 
-  console.log(`[ok] 生成 feed=${feed.length} 类, pet=${pet.length} 条，开始校验链接…`);
+  // pet：拆 2 次（每次 5 条），合计最多 10 条
+  const petA = await genPetSlice('老年犬关节保养、猫咪泌尿、老年猫犬日常护理');
+  const petB = await genPetSlice('宠物保健品市场趋势、宠物内容渠道(抖音/小红书/B站)');
+  const pet = dedupeItems(petA.concat(petB));
+  console.log(`[pet] ${pet.length} 条 (A=${petA.length} + B=${petB.length})`);
+
+  // 兜底：若某块完全空（模型抽风），写空结构也不让整条 run 挂掉（明天覆盖）
+  const feedTotal = feed.reduce((n, g) => n + g.items.length, 0);
+  if (!feedTotal) console.log(`[warn] feed 全部为空，写入空结构`);
+  if (!pet.length) console.log(`[warn] pet 全部为空，写入空结构`);
+
+  console.log(`[ok] 生成 feed=${feed.length} 类(${feedTotal}条), pet=${pet.length} 条，开始校验链接…`);
   await validateLinks(feed);
   await validateLinks([{ items: pet }]);
 
   const deadFeed = feed.reduce((n, g) => n + g.items.filter((i) => i.link === '#').length, 0);
   const deadPet = pet.filter((i) => i.link === '#').length;
-  console.log(`[link] feed 死链 ${deadFeed}/${feed.length * 3}, pet 死链 ${deadPet}/${pet.length}`);
+  const totalFeed = feed.reduce((n, g) => n + g.items.length, 0);
+  console.log(`[link] feed 死链 ${deadFeed}/${totalFeed}, pet 死链 ${deadPet}/${pet.length}`);
 
   writeFileSync('feed.json', JSON.stringify(feed, null, 2) + '\n', 'utf8');
   writeFileSync('pet.json', JSON.stringify(pet, null, 2) + '\n', 'utf8');
