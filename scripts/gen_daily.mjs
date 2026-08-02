@@ -83,7 +83,8 @@ async function callLLM(system, user, retries = 3) {
       const data = await res.json();
       const content = data?.choices?.[0]?.message?.content || '';
       try {
-        return extractJSON(content);
+        // 返回 {data, raw}，raw 用于归一化失败时附在错误信息里看清模型实际回了啥
+        return { data: extractJSON(content), raw: content };
       } catch (parseErr) {
         throw new Error(`JSON 解析失败: ${parseErr.message} | 原文头200字: ${String(content).slice(0, 200)}`);
       }
@@ -92,6 +93,36 @@ async function callLLM(system, user, retries = 3) {
       if (i === retries - 1) throw e;
     }
   }
+}
+
+// 结构归一化：search-preview 模型有时不严格按 prompt 返回数组，会给单对象或键值映射
+function normalizeFeed(x) {
+  if (Array.isArray(x)) {
+    if (x.length && Array.isArray(x[0]?.items)) return x;
+    return null;  // 数组但元素没 items 字段 → 形状不对
+  }
+  if (x && typeof x === 'object') {
+    // 单对象 {cat, items:[...]}
+    if (Array.isArray(x.items)) return [{ cat: x.cat || '', items: x.items }];
+    // 键值映射 {AI: {items:[...]}, 电商: {items:[...]}, ...}
+    const arr = [];
+    for (const k of Object.keys(x)) {
+      const v = x[k];
+      if (v && typeof v === 'object' && Array.isArray(v.items)) {
+        arr.push({ cat: v.cat || k, items: v.items });
+      }
+    }
+    if (arr.length) return arr;
+  }
+  return null;
+}
+function normalizePet(x) {
+  if (Array.isArray(x)) {
+    if (x.length && typeof x[0] === 'object' && (x[0].t !== undefined || x[0].s !== undefined)) return x;
+    return null;
+  }
+  if (x && typeof x === 'object' && Array.isArray(x.items)) return x.items;
+  return null;
 }
 
 // 链接可达性校验：DNS 失败/超时/404 → 置 '#'（App 不显示死链原文入口）
@@ -150,12 +181,14 @@ async function main() {
 2) 内容有料、真实，别水。
 【输出格式】严格只输出一个 JSON 数组，从 [ 开头、] 结尾，无任何其他字符：[{t,s,link,tag}, ...]`;
 
-  const feed = await callLLM(feedSys, feedUser);
-  const pet = await callLLM(petSys, petUser);
+  const { data: feedData, raw: feedRaw } = await callLLM(feedSys, feedUser);
+  const { data: petData, raw: petRaw } = await callLLM(petSys, petUser);
 
-  // 结构兜底
-  if (!Array.isArray(feed) || feed.length === 0) throw new Error('feed 结构异常');
-  if (!Array.isArray(pet) || pet.length === 0) throw new Error('pet 结构异常');
+  // 结构兜底+归一化：search-preview 模型常不按 prompt 返回数组（返回单对象/键值映射）
+  const feed = normalizeFeed(feedData);
+  if (!feed) throw new Error(`feed 归一化失败 | 类型=${typeof feedData}, isArray=${Array.isArray(feedData)}, keys=${feedData && typeof feedData === 'object' ? Object.keys(feedData).slice(0, 5).join(',') : 'n/a'} | 原文头300: ${String(feedRaw).slice(0, 300)}`);
+  const pet = normalizePet(petData);
+  if (!pet) throw new Error(`pet 归一化失败 | 类型=${typeof petData}, isArray=${Array.isArray(petData)} | 原文头300: ${String(petRaw).slice(0, 300)}`);
 
   console.log(`[ok] 生成 feed=${feed.length} 类, pet=${pet.length} 条，开始校验链接…`);
   await validateLinks(feed);
