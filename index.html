@@ -1186,7 +1186,7 @@ async function saveSession(){
  await accumulateEx(exs,part);
  builder=[];addRow();$('#tr-part').value='';
  renderHistory();updateHome();updateTrainStreak();
- syncToCloud();
+ scheduleSync();
  confetti(['💪','🔥','✨','🏋️']);
  alert('✅ 已保存 '+exs.length+' 个动作');
 }
@@ -1221,6 +1221,10 @@ async function syncFromCloud(){
  updateSyncBadge();
 }
 function syncNow(){updateSyncBadge();syncToCloud()}
+/* 防抖同步：点赞/收藏/力训频繁操作时合并为一次云端写入；静默期(2.5s)后或页面关闭前补推，避免误触反复上云 */
+let _syncTimer=null;const SYNC_DEBOUNCE=2500;
+function scheduleSync(){if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(()=>{_syncTimer=null;syncToCloud()},SYNC_DEBOUNCE)}
+window.addEventListener('pagehide',()=>{if(_syncTimer){clearTimeout(_syncTimer);_syncTimer=null;syncToCloud()}});
 
 function renderHistory(){
  const el=$('#history');
@@ -1238,7 +1242,7 @@ function renderHistory(){
 }
 function loadToBuilder(i){builder=sessions[i].exs.map(e=>({...e}));$('#tr-date').value=sessions[i].date;$('#tr-part').value=sessions[i].part;trainTab('record');renderBuilder();window.scrollTo(0,0)}
 function delSession(i){if(!confirm('删除这条记录？'))return;sessions.splice(i,1);lsSet('qx_sessions',sessions);renderHistory();updateHome();updateTrainStreak()}
-function delEx(n){if(!confirm('确定从个人动作库删除「'+n+'」吗？\n（训练历史里的记录不受影响）'))return;let c=ls('qx_customEx',[]);c=c.filter(e=>e.n!==n);lsSet('qx_customEx',c);let cnt=ls('qx_exCount',{});if(cnt[n]!==undefined){delete cnt[n];lsSet('qx_exCount',cnt);}syncToCloud();renderLib($('#tr-part').value||'胸');}
+function delEx(n){if(!confirm('确定从个人动作库删除「'+n+'」吗？\n（训练历史里的记录不受影响）'))return;let c=ls('qx_customEx',[]);c=c.filter(e=>e.n!==n);lsSet('qx_customEx',c);let cnt=ls('qx_exCount',{});if(cnt[n]!==undefined){delete cnt[n];lsSet('qx_exCount',cnt);}scheduleSync();renderLib($('#tr-part').value||'胸');}
 function renderLib(part){
  $('#body-title').textContent=part+' · 肌群预览';
  $('#body-svg-container').innerHTML=bodySVG(part);
@@ -1299,7 +1303,7 @@ function editExMeta(n){
   const s=ov.querySelector('#ex-s').value.trim();
   x.p=p;x.s=s;x.part=selPart;
   const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
-  syncToCloud();
+  scheduleSync();
   ov.remove();
   renderLib(selPart||$('#tr-part').value||'胸');
  };
@@ -1318,7 +1322,7 @@ function genPlan(){
   ${picks.map((e,i)=>`<div class="plan-item"><div class="check ${done.includes(i)?'on':''}" onclick="togglePlan(${i})">${done.includes(i)?'✓':''}</div><div><b>${esc(e.n)}</b><div class="sm muted">${esc(e.g)} · ${esc(e.s)}</div></div></div>`).join('')}
   <button class="btn ghost sm" style="margin-top:8px;width:auto" onclick="loadPlanToBuilder()">把这组载入今日记录</button>`:`<div class="empty">${catNap}选一个部位开始</div>`;
 }
-function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.indexOf(i);if(idx>=0)d.splice(idx,1);else d.push(i);lsSet(k,d);genPlan();syncToCloud()}
+function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.indexOf(i);if(idx>=0)d.splice(idx,1);else d.push(i);lsSet(k,d);genPlan();scheduleSync()}
 function loadPlanToBuilder(){const f=$('#plan-focus').value;let picks=[];if(f.startsWith('全身')){if(f.includes('推'))picks=[...EX['胸'].slice(0,2),EX['肩'][0],EX['三头'][0]];else if(f.includes('拉'))picks=[...EX['背'].slice(0,2),EX['二头'][0],EX['背'][4]];else if(f.includes('腿'))picks=[...EX['腿'].slice(0,3),EX['核心'][0]];else picks=[EX['胸'][0],EX['背'][0],EX['肩'][0],EX['腿'][0],EX['核心'][0]]}else if(EX[f])picks=EX[f].slice(0,5);builder=picks.map(e=>({n:e.n,sets:'',reps:'',wt:'',rpe:''}));if($('#tr-part').value==='')$('#tr-part').value=f.startsWith('全身')?'':f;trainTab('record');renderBuilder()}
 
 /* ===== 统一内容卡片 ===== */
@@ -1352,12 +1356,12 @@ function artClick(ds,act){
   const k=artKey({cat:a.c,t:a.t});
   if(act==='like'){
     if(liked.some(x=>artKey(x)===k)){liked=liked.filter(x=>artKey(x)!==k)}
-    else{liked=[{cat:a.c,mod:a.m,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...liked];confetti(['👍','❤️','✨'])}
-    lsSet('qx_liked',liked);
+    else{    liked=[{cat:a.c,mod:a.m,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...liked];confetti(['👍','❤️','✨'])}
+    lsSet('qx_liked',liked);scheduleSync();
   }else if(act==='save'){
     if(saved.some(x=>artKey(x)===k)){saved=saved.filter(x=>artKey(x)!==k)}
     else{saved=[{cat:a.c,mod:a.m,t:a.t,s:a.s,link:a.link,tag:a.tag,ts:Date.now()},...saved];confetti(['⭐','✨','🌟'])}
-    lsSet('qx_saved',saved);
+    lsSet('qx_saved',saved);scheduleSync();
   }else if(act==='share'){
     const txt=`【${a.c||''}】${a.t}\n${a.s||''}`+(a.link&&a.link!=='#'?`\n${a.link}`:'');
     const fallback=()=>{if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>alert('已复制，去微信粘贴给朋友讨论')).catch(()=>prompt('复制分享内容：',txt))}else{prompt('复制分享内容：',txt)}};
@@ -1380,8 +1384,8 @@ function savedItemCard(x,idx,isLike){
     ${link?`<a href="${esc(x.link)}" target="_blank" rel="noopener" class="sm pri-link" style="display:inline-block;margin-top:6px">查看原文 ↗</a>`:''}
   </div>`;
 }
-function unsaveItem(idx){saved.splice(idx,1);lsSet('qx_saved',saved);renderNews();updateHome()}
-function unlikeItem(idx){liked.splice(idx,1);lsSet('qx_liked',liked);renderNews();updateHome()}
+function unsaveItem(idx){saved.splice(idx,1);lsSet('qx_saved',saved);renderNews();updateHome();scheduleSync()}
+function unlikeItem(idx){liked.splice(idx,1);lsSet('qx_liked',liked);renderNews();updateHome();scheduleSync()}
 
 /* ===== 资讯 ===== */
 let NEWS_FEED=null,PET_FEED=null,feedLoaded=false;
