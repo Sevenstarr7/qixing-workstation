@@ -1195,7 +1195,7 @@ const DATA_REPO='Sevenstarr7/qx-userdata';
 function getTok(){return ls('qx_github_token','')}
 async function saveToken(){const v=$('#gh-token').value.trim();if(!v){alert('先粘贴 GitHub Token');return}lsSet('qx_github_token',v);$('#gh-token').value='';updateSyncBadge();await syncFromCloud();await syncToCloud();}
 function updateSyncBadge(){const b=$('#sync-badge');if(!b)return;if(getTok()){b.textContent='已配置';b.className='badge mint'}else{b.textContent='未配置';b.className='badge'}}
-function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
+function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount','qx_liked','qx_saved'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
 function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
 function b64d(s){return decodeURIComponent(escape(atob(s)))}
 async function syncToCloud(){
