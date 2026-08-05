@@ -696,8 +696,15 @@ body[data-dow="7"]{--w1:#e8e0f0;--w2:#dcd0e8;--w3:#d0c4dc;--f1:#c8c0d4;--f2:#bcb
         </svg>
         <label class="fl">日期</label>
         <input type="date" id="tr-date">
-        <label class="fl" style="margin-top:12px">训练部位（可选）</label>
-        <select id="tr-part"><option value="">选择部位</option></select>
+        <label class="fl" style="margin-top:12px">热身动作（可选）</label>
+        <div style="display:flex;gap:8px">
+          <input id="warmup-search" type="text" placeholder="搜索或添加热身..." style="flex:1;box-sizing:border-box;border:1.5px solid #d8ccb2;border-radius:10px;padding:8px;font-family:inherit;font-size:13px" oninput="renderWarmupList()" onkeydown="if(event.key==='Enter'){event.preventDefault();warmupCreateOrSelect()}">
+        </div>
+        <div id="warmup-list" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+        <div id="warmup-picked" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px"></div>
+        <div class="sep"></div>
+        <label class="fl" style="margin-top:12px">今天练哪些部位？（可多选，含全身）</label>
+        <div id="part-chips" class="chips"></div>
         <div class="sep"></div>
         <div id="builder"></div>
         <button class="btn ghost sm" style="margin-bottom:10px" onclick="addRow()">+ 添加动作</button>
@@ -1033,6 +1040,11 @@ const EX={
   {n:'悬垂举腿',t:'自重',g:'下腹/髂腰肌',p:'控制不晃,腿抬至水平以上,慢放',s:'3×10-15'},
   {n:'俄罗斯转体',t:'自重',g:'腹斜肌',p:'屈膝抬脚,转体触地,控速',s:'4×20'},
   {n:'死虫式',t:'自重',g:'核心稳定',p:'对侧手脚伸,腰贴地,呼气发力',s:'3×10'}
+ ],
+ '全身':[
+  {n:'杠铃硬拉',t:'复合',g:'腘绳/臀/背/核心',p:'屈髋背平,杠铃贴腿拉至大腿中,肩胛后缩,脊柱中立',s:'4×5-8'},
+  {n:'壶铃摆动',t:'复合',g:'臀/腘绳/核心',p:'髋铰链发力,靠臀推不是手甩,顶端夹臀收盆底',s:'4×15-20'},
+  {n:'波比跳',t:'自重',g:'全身/心肺',p:'下蹲撑地→退腿俯卧撑→收腿→向上跳,连贯呼吸',s:'4×10-15'}
  ]
 };
 const PARTS=Object.keys(EX);
@@ -1088,7 +1100,77 @@ const PET=[
 
 /* ===== 力训 ===== */
 let sessions=ls('qx_sessions',[]);
+let editingId=null;
 let builder=[];
+let warmupPicked=[];
+let selParts=[];
+const WARMUP=['肩部绕环','胸椎旋转','世界最伟大拉伸','泡沫轴','弹力带肩外旋'];
+const ALLPARTS=PARTS.slice();
+function renderPartChips(){
+ const wrap=$('#part-chips');if(!wrap)return;wrap.innerHTML='';
+ ALLPARTS.forEach(p=>{
+  const on=selParts.includes(p);
+  const b=document.createElement('button');
+  b.className='chip'+(on?' active':'');b.textContent=p;
+  b.onclick=()=>{if(selParts.includes(p))selParts=selParts.filter(x=>x!==p);else selParts.push(p);renderPartChips();};
+  wrap.appendChild(b);
+ });
+}
+function getWarmupCustom(){return ls('qx_warmupCustom',[]);}
+function setWarmupCustom(a){lsSet('qx_warmupCustom',a);}
+function allWarmups(){return [...WARMUP,...getWarmupCustom()];}
+function renderWarmupList(){
+ const wrap=$('#warmup-list');if(!wrap)return;wrap.innerHTML='';
+ const q=($('#warmup-search').value||'').trim();
+ const cust=getWarmupCustom();
+ const list=allWarmups().filter(w=>!q||w.includes(q));
+ if(list.length){
+  list.forEach(w=>{
+   const on=warmupPicked.includes(w);
+   const b=document.createElement('button');
+   b.className='chip'+(on?' active':'');
+   b.textContent=w;
+   b.onclick=()=>toggleWarmup(w);
+   if(cust.includes(w)){
+    const x=document.createElement('span');
+    x.textContent=' ✕';x.style.cssText='opacity:.6;font-size:11px;cursor:pointer';
+    x.onclick=(e)=>{e.stopPropagation();delWarmupCustom(w);};
+    b.appendChild(x);
+   }
+   wrap.appendChild(b);
+  });
+ }else if(q){
+  const b=document.createElement('button');
+  b.className='chip';b.style.borderStyle='solid';b.style.borderColor='var(--olive)';b.style.color='var(--olive)';
+  b.textContent='＋ 创建「'+q+'」';
+  b.onclick=()=>warmupCreateOrSelect();
+  wrap.appendChild(b);
+ }
+}
+function toggleWarmup(w){if(warmupPicked.includes(w))warmupPicked=warmupPicked.filter(x=>x!==w);else warmupPicked.push(w);renderWarmupList();renderWarmupPicked();}
+function warmupCreateOrSelect(){
+ const q=($('#warmup-search').value||'').trim();if(!q)return;
+ if(!allWarmups().includes(q)){const cust=getWarmupCustom();if(!cust.includes(q)){cust.push(q);setWarmupCustom(cust);scheduleSync();}}
+ if(!warmupPicked.includes(q))warmupPicked.push(q);
+ $('#warmup-search').value='';
+ renderWarmupList();renderWarmupPicked();
+}
+function delWarmupCustom(name){
+ setWarmupCustom(getWarmupCustom().filter(x=>x!==name));
+ warmupPicked=warmupPicked.filter(x=>x!==name);
+ scheduleSync();renderWarmupList();renderWarmupPicked();
+}
+function renderWarmupPicked(){
+ const wrap=$('#warmup-picked');if(!wrap)return;wrap.innerHTML='';
+ warmupPicked.forEach((w,i)=>{
+  const t=document.createElement('span');
+  t.style.cssText='display:inline-flex;align-items:center;gap:4px;background:var(--honey2);color:#8a6a25;border-radius:999px;padding:4px 10px;font-size:12px;font-family:ZCOOL KuaiLe';
+  t.innerHTML=esc(w)+' <span style="cursor:pointer" onclick="removeWarmup('+i+')">✕</span>';
+  wrap.appendChild(t);
+ });
+}
+function removeWarmup(i){warmupPicked.splice(i,1);renderWarmupList();renderWarmupPicked()}
+
 
 function getLastRecord(exName){
   for(const s of sessions){
@@ -1099,7 +1181,7 @@ function getLastRecord(exName){
 }
 function initTrain(){
  $('#tr-date').value=today();
- const ps=$('#tr-part');PARTS.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o)});
+ renderPartChips();renderWarmupList();
  const chips=$('#lib-chips');PARTS.forEach((p,i)=>{const b=document.createElement('button');b.className='chip'+(i===0?' active':'');b.textContent=p;b.onclick=()=>{chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');renderLib(p)};chips.appendChild(b)});
  const sel=$('#plan-focus');['胸','背','肩','二头','三头','腿','臀','核心','全身(推)','全身(拉)','全身(腿)'].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
  renderLib(PARTS[0]);
@@ -1180,22 +1262,26 @@ async function accumulateEx(exs,part){
 async function saveSession(){
  const exs=builder.filter(r=>r.n.trim());
  if(!exs.length){alert('先添加至少一个动作');return}
- const part=$('#tr-part').value;
- const s={date:$('#tr-date').value||today(),part,exs};
- sessions.unshift(s);lsSet('qx_sessions',sessions);
- await accumulateEx(exs,part);
- builder=[];addRow();$('#tr-part').value='';
+ const parts=selParts.slice();
+ const warmup=warmupPicked.slice();
+ const s={date:$('#tr-date').value||today(),parts,part:parts.join('/'),warmup,exs};
+ const idx=editingId?sessions.findIndex(x=>x.id===editingId):-1;
+ if(idx>=0){s.id=editingId;sessions[idx]=s;}else{s.id='sid'+Date.now();sessions.unshift(s);}
+ lsSet('qx_sessions',sessions);
+ editingId=null;
+ await accumulateEx(exs,parts[0]||'');
+ builder=[];addRow();selParts=[];warmupPicked=[];renderPartChips();renderWarmupList();renderWarmupPicked();
  renderHistory();updateHome();updateTrainStreak();
  scheduleSync();
  confetti(['💪','🔥','✨','🏋️']);
- alert('✅ 已保存 '+exs.length+' 个动作');
+ alert('✅ 已保存 '+exs.length+' 个动作'+(warmup.length?' · 热身'+warmup.length+'项':''));
 }
 /* ===== 云端同步（私有仓库 qx-userdata）===== */
 const DATA_REPO='Sevenstarr7/qx-userdata';
 function getTok(){return ls('qx_github_token','')}
 async function saveToken(){const v=$('#gh-token').value.trim();if(!v){alert('先粘贴 GitHub Token');return}lsSet('qx_github_token',v);$('#gh-token').value='';updateSyncBadge();await syncFromCloud();await syncToCloud();}
 function updateSyncBadge(){const b=$('#sync-badge');if(!b)return;if(getTok()){b.textContent='已配置';b.className='badge mint'}else{b.textContent='未配置';b.className='badge'}}
-function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount','qx_liked','qx_saved'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
+function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount','qx_liked','qx_saved','qx_warmupCustom'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
 function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
 function b64d(s){return decodeURIComponent(escape(atob(s)))}
 async function syncToCloud(){
@@ -1231,18 +1317,19 @@ function renderHistory(){
  if(!sessions.length){el.innerHTML=`<div class="empty">${catNap}还没有记录，私教课或自练后来记一笔</div>`;return}
  el.innerHTML=sessions.map((s,i)=>`
   <div class="rf-item">
-   <div class="row between">
-    <div><b>${esc(s.date)}</b> ${s.part?'<span class="tag">'+esc(s.part)+'</span>':''} <span class="sm muted">${s.exs.length}个动作</span></div>
-    <div><button class="btn sm ghost" style="padding:5px 12px" onclick="loadToBuilder(${i})">载入</button> <button class="btn sm" style="padding:5px 12px;background:var(--rose2);color:#a85a5a;box-shadow:0 2px 0 #dcc0c0" onclick="delSession(${i})">删</button></div>
+   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 10px">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0"><b style="font-size:15px;white-space:nowrap">${esc(s.date)}</b>${(s.parts||[s.part]).filter(Boolean).map(p=>'<span class="tag">'+esc(p)+'</span>').join('')}</div>
+    <div style="display:flex;gap:6px;flex-shrink:0"><button class="btn sm ghost" style="padding:5px 12px" onclick="loadToBuilder(${i})">编辑</button> <button class="btn sm" style="padding:5px 12px;background:var(--rose2);color:#a85a5a;box-shadow:0 2px 0 #dcc0c0" onclick="delSession(${i})">删</button></div>
    </div>
+   ${s.warmup&&s.warmup.length?`<div style="margin-top:6px" class="sm muted">🔥 热身：${s.warmup.map(w=>esc(w)).join('、')}</div>`:''}
    <table class="ex-table"><tr><th>动作</th><th>组</th><th>kg</th></tr>
    ${s.exs.map(e=>`<tr><td>${esc(e.n)}</td><td>${esc(e.sets)}</td><td>${esc(e.wt)}</td></tr>`).join('')}
    </table>
   </div>`).join('');
 }
-function loadToBuilder(i){builder=sessions[i].exs.map(e=>({...e}));$('#tr-date').value=sessions[i].date;$('#tr-part').value=sessions[i].part;trainTab('record');renderBuilder();window.scrollTo(0,0)}
+function loadToBuilder(i){const s=sessions[i];if(!s.id)s.id='sid'+Date.now();lsSet('qx_sessions',sessions);editingId=s.id;builder=s.exs.map(e=>({...e}));$('#tr-date').value=s.date;selParts=(s.parts||[s.part]).filter(Boolean).slice();warmupPicked=(s.warmup||[]).slice();trainTab('record');renderPartChips();renderWarmupList();renderWarmupPicked();renderBuilder();window.scrollTo(0,0)}
 function delSession(i){if(!confirm('删除这条记录？'))return;sessions.splice(i,1);lsSet('qx_sessions',sessions);renderHistory();updateHome();updateTrainStreak()}
-function delEx(n){if(!confirm('确定从个人动作库删除「'+n+'」吗？\n（训练历史里的记录不受影响）'))return;let c=ls('qx_customEx',[]);c=c.filter(e=>e.n!==n);lsSet('qx_customEx',c);let cnt=ls('qx_exCount',{});if(cnt[n]!==undefined){delete cnt[n];lsSet('qx_exCount',cnt);}scheduleSync();renderLib($('#tr-part').value||'胸');}
+function delEx(n){if(!confirm('确定从个人动作库删除「'+n+'」吗？\n（训练历史里的记录不受影响）'))return;let c=ls('qx_customEx',[]);c=c.filter(e=>e.n!==n);lsSet('qx_customEx',c);let cnt=ls('qx_exCount',{});if(cnt[n]!==undefined){delete cnt[n];lsSet('qx_exCount',cnt);}scheduleSync();renderLib(selParts[0]||'胸');}
 function renderLib(part){
  $('#body-title').textContent=part+' · 肌群预览';
  $('#body-svg-container').innerHTML=bodySVG(part);
@@ -1266,7 +1353,7 @@ function renderLib(part){
 }
 function addToBuilder(n,part){
  if($('#tr-date').value==='')$('#tr-date').value=today();
- if($('#tr-part').value==='')$('#tr-part').value=part;
+ if(!selParts.length&&part){selParts.push(part);renderPartChips();}
  builder.push({n,sets:'',reps:'',wt:'',rpe:''});renderBuilder();
  trainTab('record');
 }
@@ -1305,7 +1392,7 @@ function editExMeta(n){
   const i=c.findIndex(e=>e.n===n);if(i>=0){c[i]=x;lsSet('qx_customEx',c);}
   scheduleSync();
   ov.remove();
-  renderLib(selPart||$('#tr-part').value||'胸');
+  renderLib(selPart||selParts[0]||'胸');
  };
 }
 function genPlan(){
