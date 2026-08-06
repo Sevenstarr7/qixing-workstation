@@ -1,0 +1,761 @@
+{
+  "window_days": 7,
+  "generic_tags": [
+    "AI",
+    "电商",
+    "产品经理",
+    "产品sense",
+    "海外独立站",
+    "宠物",
+    "大模型",
+    "DTC",
+    "独立站",
+    "跨境",
+    "趋势",
+    "市场",
+    "渠道",
+    "内容渠道",
+    "种草",
+    "科普",
+    "平台",
+    "品牌",
+    "增长",
+    "运营",
+    "用户",
+    "数据",
+    "案例",
+    "方法论",
+    "打法",
+    "复盘",
+    "护理",
+    "养老",
+    "分龄",
+    "适口性",
+    "合规",
+    "高复购",
+    "强复购",
+    "高利润",
+    "预防刚需",
+    "预防医疗",
+    "方案售卖",
+    "智慧生活",
+    "价值本质",
+    "客户价值",
+    "判断力",
+    "组织",
+    "AI杠杆",
+    "护城河",
+    "数据壁垒",
+    "垂直智能",
+    "人机协同",
+    "人机协作",
+    "半自动",
+    "控制权",
+    "采纳率",
+    "验收标准",
+    "AI指标",
+    "人工接管",
+    "指标重构",
+    "任务成功率",
+    "PM能力",
+    "PM成长",
+    "AI原生",
+    "考核体系",
+    "人机分工",
+    "Agent执行",
+    "组织重构",
+    "Agent产品",
+    "B2A",
+    "模型分层",
+    "评估体系",
+    "成本把控",
+    "AI产品经理",
+    "超级个体",
+    "企业级Agent",
+    "B端",
+    "SaaS整合",
+    "千问办公",
+    "商业转折",
+    "生态话语权",
+    "开源策略",
+    "超级App入口",
+    "GEO",
+    "AI编程",
+    "AI应用",
+    "AI重构",
+    "跨境金融",
+    "多币种结算",
+    "支付栈",
+    "跨境拐点",
+    "本地化",
+    "合规壁垒",
+    "跨境整合",
+    "退出率",
+    "本地支付",
+    "弃单率",
+    "建站选型",
+    "AI搜索",
+    "国际化",
+    "多币种",
+    "出海节奏",
+    "门店分层",
+    "履约管控",
+    "七夕大促",
+    "运费险",
+    "纯佣商单",
+    "品质治理",
+    "供应链",
+    "服饰退货",
+    "便利店升仓",
+    "最高法",
+    "直播电商合规",
+    "永辉",
+    "AI家电",
+    "4大趋势",
+    "剂型适口性",
+    "硬软一体",
+    "养老清单",
+    "消化免疫"
+  ],
+  "entries": [
+    {
+      "date": "2026-08-05",
+      "items": [
+        {
+          "link": "https://www.163.com/dy/article/L3DEB79A0514R9P4_pdya11y.html",
+          "tags": [
+            "Qwen3.8",
+            "旗舰模型",
+            "Agent",
+            "自主编程"
+          ]
+        },
+        {
+          "link": "https://www.163.com/dy/article/L3GEMQUO0519DDQ2.html",
+          "tags": [
+            "Qwen",
+            "开源策略",
+            "生态话语权",
+            "商业转折"
+          ]
+        },
+        {
+          "link": "https://www.ifnews.com/news.html?aid=856458&cid=43",
+          "tags": [
+            "千问办公",
+            "企业级Agent",
+            "B端",
+            "SaaS整合"
+          ]
+        },
+        {
+          "link": "https://www.ebrun.com/",
+          "tags": [
+            "AI应用",
+            "超级App入口",
+            "GEO",
+            "AI编程"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260720A08MSS00",
+          "tags": [
+            "产品护城河",
+            "AI重构",
+            "数据壁垒",
+            "垂直智能"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/?p=6351497",
+          "tags": [
+            "AI产品经理",
+            "成本把控",
+            "评估体系",
+            "模型分层"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/share/6387779.html",
+          "tags": [
+            "B2A",
+            "Agent产品",
+            "任务成功率",
+            "指标重构"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7633740780846219819",
+          "tags": [
+            "PMxAI大会",
+            "超级个体",
+            "人机协同",
+            "PM能力"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7633740780846219819",
+          "tags": [
+            "PM成长",
+            "四层跃迁",
+            "AI原生",
+            "价值本质"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260720A08MSS00",
+          "tags": [
+            "组织重构",
+            "Agent执行",
+            "人机分工",
+            "考核体系"
+          ]
+        },
+        {
+          "link": "https://www.163.com/dy/article/L3DHHAPF0514R9OJ.html",
+          "tags": [
+            "苏宁818",
+            "AI家电",
+            "智慧生活",
+            "方案售卖"
+          ]
+        },
+        {
+          "link": "https://so.html5.qq.com/page/real/search_news?docid=70000021_9246a71c7af45452",
+          "tags": [
+            "便利店升仓",
+            "最高法",
+            "直播电商合规",
+            "永辉"
+          ]
+        },
+        {
+          "link": "https://school.jinritemai.com/doudian/web/articlev0/aJnzyPepoB14",
+          "tags": [
+            "抖音即时零售",
+            "七夕大促",
+            "履约管控",
+            "门店分层"
+          ]
+        },
+        {
+          "link": "https://www.ebrun.com/",
+          "tags": [
+            "抖音电商",
+            "运费险",
+            "纯佣商单",
+            "品质治理"
+          ]
+        },
+        {
+          "link": "https://gu.qq.com/resources/shy/news/detail-v2/index.html?t=1#/index?_tentrees_trans=0&id=SN2026080417095198b14a52",
+          "tags": [
+            "京东物流",
+            "快手电商",
+            "供应链",
+            "服饰退货"
+          ]
+        },
+        {
+          "link": "https://onlinestorenews.com/cross-border-commerce-hits-an-inflection-point-in-2026-2",
+          "tags": [
+            "Shopify",
+            "跨境拐点",
+            "本地化",
+            "合规壁垒"
+          ]
+        },
+        {
+          "link": "https://onlinestorenews.com/cross-border-commerce-is-entering-its-consolidation-era-in-2026",
+          "tags": [
+            "跨境整合",
+            "退出率",
+            "本地支付",
+            "弃单率"
+          ]
+        },
+        {
+          "link": "https://eastdigi.com/shopify-vs-wordpress-cross-border-website-2026/",
+          "tags": [
+            "建站选型",
+            "Shopify",
+            "WordPress",
+            "AI搜索"
+          ]
+        },
+        {
+          "link": "https://tribe.studio/insights/shopifys-global-sales-solutions-multi-currency-multi-store-and-headless",
+          "tags": [
+            "Shopify Markets",
+            "国际化",
+            "多币种",
+            "出海节奏"
+          ]
+        },
+        {
+          "link": "https://www.airwallex.com/en-hk/blog/shopify-review",
+          "tags": [
+            "跨境金融",
+            "Airwallex",
+            "多币种结算",
+            "支付栈"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/?p=6351497",
+          "tags": [
+            "人机协作",
+            "采纳率",
+            "半自动",
+            "控制权"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/share/6387779.html",
+          "tags": [
+            "任务成功率",
+            "AI指标",
+            "人工接管",
+            "验收标准"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260720A08MSS00",
+          "tags": [
+            "护城河",
+            "数据壁垒",
+            "垂直智能",
+            "客户价值"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7633740780846219819",
+          "tags": [
+            "超级个体",
+            "AI杠杆",
+            "判断力",
+            "组织"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7665315063716168228",
+          "tags": [
+            "能力飞轮",
+            "网络效应",
+            "Agent范式",
+            "结果付费"
+          ]
+        },
+        {
+          "link": "https://pet-blackgold.netlify.app/",
+          "tags": [
+            "老年犬关节",
+            "预防刚需",
+            "中西结合",
+            "ODM"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7647152208437461550",
+          "tags": [
+            "老年犬关节",
+            "MAG",
+            "分龄喂养",
+            "618数据"
+          ]
+        },
+        {
+          "link": "https://pet-blackgold.netlify.app/",
+          "tags": [
+            "老年犬关节",
+            "合规风险",
+            "配方差异化"
+          ]
+        },
+        {
+          "link": "https://pet-blackgold.netlify.app/",
+          "tags": [
+            "猫咪泌尿",
+            "三维配方",
+            "医院渠道",
+            "高利润"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7647746969745490447",
+          "tags": [
+            "猫咪泌尿",
+            "老年高发",
+            "促饮水",
+            "强复购"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7647152208437461550",
+          "tags": [
+            "老年猫犬",
+            "养老清单",
+            "分龄定制",
+            "天猫618"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7647746969745490447",
+          "tags": [
+            "老年猫犬",
+            "日常护理",
+            "消化免疫",
+            "适口性"
+          ]
+        },
+        {
+          "link": "https://www.10100.com/article/138090002",
+          "tags": [
+            "宠物保健市场",
+            "340亿美元",
+            "跨境",
+            "高复购"
+          ]
+        },
+        {
+          "link": "https://www.10100.com/article/138090002",
+          "tags": [
+            "智能设备",
+            "48亿美元",
+            "预防医疗",
+            "硬软一体"
+          ]
+        },
+        {
+          "link": "https://www.sohu.com/a/1010183965_121315152",
+          "tags": [
+            "内容渠道",
+            "4大趋势",
+            "分龄",
+            "剂型适口性"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-06",
+      "items": [
+        {
+          "link": "https://www.163.com/dy/article/L3INDEBI0556I485.html",
+          "tags": [
+            "字节",
+            "SeedRealtime",
+            "全双工",
+            "多模态"
+          ]
+        },
+        {
+          "link": "https://www.zhipuai.cn/en/",
+          "tags": [
+            "智谱",
+            "GLM-5.2",
+            "长上下文",
+            "Agent"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7670203494493585939/",
+          "tags": [
+            "Anthropic",
+            "算力",
+            "Volta",
+            "AI基建"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260805A0CWYG00?refer=cp_1009",
+          "tags": [
+            "loom",
+            "AI编程",
+            "Agent状态",
+            "开源"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260805A035OE00?refer=cp_1009",
+          "tags": [
+            "Claude Fable5",
+            "MirrorCode",
+            "AWS",
+            "企业AI编程"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/?p=6414387",
+          "tags": [
+            "AI产品大会",
+            "Vibe Coding",
+            "Agent",
+            "行业落地"
+          ]
+        },
+        {
+          "link": "https://www.zpedu.com/it/ai/41138.html",
+          "tags": [
+            "Vibe Coding",
+            "Cursor",
+            "AI生成PR",
+            "研发提效"
+          ]
+        },
+        {
+          "link": "https://so.html5.qq.com/page/real/search_news?docid=70000021_0026a70534323352",
+          "tags": [
+            "低代码",
+            "AI生成",
+            "生产级",
+            "企业治理"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/?p=6344076",
+          "tags": [
+            "PMF",
+            "需求洞察",
+            "预期管理",
+            "产品复盘"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/?p=6315341",
+          "tags": [
+            "趋势拆解",
+            "隐性需求",
+            "跨界借鉴",
+            "PM方法论"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7669708318574707226/",
+          "tags": [
+            "最高法",
+            "直播电商",
+            "平台责任",
+            "保证金"
+          ]
+        },
+        {
+          "link": "https://www.ebrun.com/20260805/692469.shtml",
+          "tags": [
+            "淘宝闪购",
+            "MCP",
+            "Agent运营",
+            "本地生活"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/w/1872500378092553",
+          "tags": [
+            "拼多多",
+            "仅退款",
+            "售后治理",
+            "权责对等"
+          ]
+        },
+        {
+          "link": "http://gu.qq.com/resources/shy/news/detail-v2/index.html#/?id=nesSN20260804155549a49d84cd&s=b",
+          "tags": [
+            "抖音电商",
+            "医疗类目",
+            "合规治理",
+            "前置拦截"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260806A0722T00?refer=cp_1009",
+          "tags": [
+            "京东",
+            "国补",
+            "以旧换新",
+            "即时零售"
+          ]
+        },
+        {
+          "link": "https://so.html5.qq.com/page/real/search_news?docid=70000021_2096a6efb8045752",
+          "tags": [
+            "TikTok Shop",
+            "内容电商",
+            "全球化",
+            "直播GMV"
+          ]
+        },
+        {
+          "link": "https://wp.tikclubs.com?p=2794/",
+          "tags": [
+            "Shopify",
+            "TikTok",
+            "一键同步",
+            "多渠道"
+          ]
+        },
+        {
+          "link": "https://big5.chinairn.com/scfx/20260617/16354452.shtml",
+          "tags": [
+            "DTC",
+            "独立站",
+            "全托管",
+            "组合拳"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7667851485706781211",
+          "tags": [
+            "跨境电商",
+            "财税合规",
+            "查账征收",
+            "VAT"
+          ]
+        },
+        {
+          "link": "https://ad-times.com/shopifys-summer-26-platform-push-reshapes-how-merchants-compete/",
+          "tags": [
+            "Shopify",
+            "Summer26",
+            "Checkout Intelligence",
+            "B2B"
+          ]
+        },
+        {
+          "link": "https://productstrategy.co/product-sense-respond-guide",
+          "tags": [
+            "Product Sense",
+            "北极星",
+            "A-B测试",
+            "JTBD"
+          ]
+        },
+        {
+          "link": "https://hellopm.co/how-to-develop-product-sense",
+          "tags": [
+            "产品Sense",
+            "刻意练习",
+            "用户访谈",
+            "预测校准"
+          ]
+        },
+        {
+          "link": "https://www.parallelhq.com/blog/what-product-sense",
+          "tags": [
+            "产品Sense",
+            "用户沉浸",
+            "框架内化",
+            "日常习惯"
+          ]
+        },
+        {
+          "link": "https://www.woshipm.com/share/6372047.html",
+          "tags": [
+            "JTBD",
+            "待办任务",
+            "需求挖掘",
+            "用户动机"
+          ]
+        },
+        {
+          "link": "https://www.bxtdata.com/pt/insights/8747/AI%E6%90%9C%E7%B4%A2%E9%A9%B1%E5%8A%A8%E4%BA%A7%E5%93%81%E7%A0%94%E5%8F%91%EF%BC%9A%E5%93%81%E7%89%8C%E5%A6%82%E4%BD%95%E7%94%A8GEO%E6%95%B0%E6%8D%AE%E6%B4%9E%E5%AF%9F%E7%94%A8%E6%88%B7%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82",
+          "tags": [
+            "GEO",
+            "AI搜索",
+            "需求洞察",
+            "产品研发"
+          ]
+        },
+        {
+          "link": "https://mip.b2b168.com/wvs323344628.html",
+          "tags": [
+            "老年犬关节",
+            "中西结合",
+            "软骨素",
+            "适口性"
+          ]
+        },
+        {
+          "link": "https://new.qq.com/rain/a/20260609A09DNH00?refer=cp_1009",
+          "tags": [
+            "老年犬关节",
+            "UC-II",
+            "骨关节炎",
+            "分阶段选品"
+          ]
+        },
+        {
+          "link": "https://post.m.smzdm.com/p/al3ppv3p/",
+          "tags": [
+            "老年犬关节",
+            "软骨素实测",
+            "日常养护",
+            "用户画像"
+          ]
+        },
+        {
+          "link": "https://so.html5.qq.com/docid/70000021_4516a73e93c69552",
+          "tags": [
+            "猫咪泌尿",
+            "蔓越莓粉",
+            "花青素",
+            "合规红线"
+          ]
+        },
+        {
+          "link": "https://www.163.com/dy/article/KUGV7AMN0556MZXV.html",
+          "tags": [
+            "猫咪泌尿",
+            "中西结合",
+            "三维配方",
+            "高毛利"
+          ]
+        },
+        {
+          "link": "https://so.html5.qq.com/docid/70000021_7296a6c202937052",
+          "tags": [
+            "老年宠",
+            "处方粮",
+            "618数据",
+            "慢病刚需"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7648816487389594158/",
+          "tags": [
+            "老年犬护理",
+            "居家舒缓",
+            "关节养护",
+            "科普种草"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7668829389039272492/",
+          "tags": [
+            "宠物经济",
+            "老年食品",
+            "AI硬件",
+            "携宠出行"
+          ]
+        },
+        {
+          "link": "https://www.hxrcon.com/industry-news/37241.html",
+          "tags": [
+            "宠物保健",
+            "抖音",
+            "下沉市场",
+            "兽医IP"
+          ]
+        },
+        {
+          "link": "https://www.toutiao.com/article/7628216199930757668",
+          "tags": [
+            "宠物内容",
+            "小红书",
+            "抖音",
+            "涨粉打法"
+          ]
+        }
+      ]
+    }
+  ]
+}
