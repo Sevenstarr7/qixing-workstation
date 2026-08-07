@@ -1298,7 +1298,7 @@ function mergeUD(L,C){
  // 动作计数：数值相加
  const ec={};const add=o=>{Object.entries(o||{}).forEach(([k,v])=>{if(typeof v==='number')ec[k]=(ec[k]||0)+v;});};add(L.qx_exCount);add(C.qx_exCount);out.qx_exCount=ec;
  // 点赞/收藏/热身：数组合并集
- const uni=(a,b)=>Array.from(new Set([].concat(a||[],b||[])));
+ const keyOf=x=>(x&&x.cat?x.cat:'')+'|'+(x&&x.t?x.t:'');const uni=(a,b)=>{const m={};([]).concat(a||[],b||[]).forEach(x=>{const k=keyOf(x);if(k)m[k]=x;});return Object.values(m);};
  out.qx_liked=uni(L.qx_liked,C.qx_liked);out.qx_saved=uni(L.qx_saved,C.qx_saved);out.qx_warmupCustom=uni(L.qx_warmupCustom,C.qx_warmupCustom);
  // 训练计划：按 key 合并（云端优先，缺失补本地）
  const plans={};Object.keys(L).forEach(k=>{if(k.indexOf('qx_plan_')===0)plans[k]=L[k];});Object.keys(C).forEach(k=>{if(k.indexOf('qx_plan_')===0)plans[k]=C[k];});
@@ -1326,15 +1326,16 @@ async function syncFromCloud(){
   const r=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
   if(r.status!==200)return;const j=await r.json();let cloud;try{cloud=JSON.parse(b64d(j.content))}catch{return}
   if(!cloud||!cloud.savedAt)return;
-  const local=collectUserdata();const merged=mergeUD(local,cloud);
-  const localN=(local.qx_sessions||[]).length, mergeN=(merged.qx_sessions||[]).length;
-  // 仅当合并结果不比本地少时才写回，绝不清空本地
-  if(mergeN>=localN){
-   Object.keys(merged).forEach(k=>{if(k==='savedAt')return;lsSet(k,merged[k])});
-   lsSet('qx_sync_saved',String(merged.savedAt));
-   sessions=ls('qx_sessions',[]);renderHistory();updateHome();updateTrainStreak();
-   if(st)st.textContent='☁️ 已合并恢复 '+new Date(cloud.savedAt).toLocaleString();
-  }
+ const local=collectUserdata();const merged=mergeUD(local,cloud);
+ // 合并式已保证每项都是并集（绝不清空本地），直接全量写回
+ Object.keys(merged).forEach(k=>{if(k==='savedAt')return;lsSet(k,merged[k])});
+ lsSet('qx_sync_saved',String(merged.savedAt));
+ // 关键修复：把云端恢复的点赞/收藏同步进内存变量并刷新资讯 UI，否则 localStorage 有数据但界面仍显示 0
+ liked=Array.isArray(merged.qx_liked)?merged.qx_liked.slice():[];
+ saved=Array.isArray(merged.qx_saved)?merged.qx_saved.slice():[];
+ sessions=ls('qx_sessions',[]);
+ renderHistory();renderNews();updateHome();updateTrainStreak();
+ if(st)st.textContent='☁️ 已合并恢复 '+new Date(cloud.savedAt).toLocaleString();
  }catch(e){}
  updateSyncBadge();
 }
@@ -1445,7 +1446,7 @@ function togglePlan(i){const k='qx_plan_'+today();let d=ls(k,[]);const idx=d.ind
 function loadPlanToBuilder(){const f=$('#plan-focus').value;let picks=[];if(f.startsWith('全身')){if(f.includes('推'))picks=[...EX['胸'].slice(0,2),EX['肩'][0],EX['三头'][0]];else if(f.includes('拉'))picks=[...EX['背'].slice(0,2),EX['二头'][0],EX['背'][4]];else if(f.includes('腿'))picks=[...EX['腿'].slice(0,3),EX['核心'][0]];else picks=[EX['胸'][0],EX['背'][0],EX['肩'][0],EX['腿'][0],EX['核心'][0]]}else if(EX[f])picks=EX[f].slice(0,5);builder=picks.map(e=>({n:e.n,sets:'',reps:'',wt:'',rpe:''}));if($('#tr-part').value==='')$('#tr-part').value=f.startsWith('全身')?'':f;trainTab('record');renderBuilder()}
 
 /* ===== 统一内容卡片 ===== */
-let liked=ls('qx_liked',[]);if(liked.length&&typeof liked[0]==='string')liked=[];
+let liked=ls('qx_liked',[]);if(liked.length&&typeof liked[0]==='string')liked=liked.map(t=>({cat:'',mod:'news',t:String(t),s:''}));
 let saved=ls('qx_saved',[]);
 liked=liked.map(x=>({...x,mod:x.mod||(x.cat==='宠物'?'pet':'news')}));
 saved=saved.map(x=>({...x,mod:x.mod||(x.cat==='宠物'?'pet':'news')}));
