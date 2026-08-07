@@ -1276,23 +1276,47 @@ async function saveSession(){
  confetti(['💪','🔥','✨','🏋️']);
  alert('✅ 已保存 '+exs.length+' 个动作'+(warmup.length?' · 热身'+warmup.length+'项':''));
 }
-/* ===== 云端同步（私有仓库 qx-userdata）===== */
+/* ===== 云端同步（私有仓库 qx-userdata，合并式，绝不互相清空）===== */
 const DATA_REPO='Sevenstarr7/qx-userdata';
+const UD_KEYS=['qx_sessions','qx_customEx','qx_exCount','qx_liked','qx_saved','qx_warmupCustom'];
 function getTok(){return ls('qx_github_token','')}
 async function saveToken(){const v=$('#gh-token').value.trim();if(!v){alert('先粘贴 GitHub Token');return}lsSet('qx_github_token',v);$('#gh-token').value='';updateSyncBadge();await syncFromCloud();await syncToCloud();}
 function updateSyncBadge(){const b=$('#sync-badge');if(!b)return;if(getTok()){b.textContent='已配置';b.className='badge mint'}else{b.textContent='未配置';b.className='badge'}}
-function collectUserdata(){const d={savedAt:Date.now()};['qx_sessions','qx_customEx','qx_exCount','qx_liked','qx_saved','qx_warmupCustom'].forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
+function collectUserdata(){const d={savedAt:Date.now()};UD_KEYS.forEach(k=>d[k]=ls(k,[]));Object.keys(localStorage).forEach(k=>{if(k.indexOf('qx_plan_')===0)d[k]=ls(k,[])});return d}
 function b64e(s){return btoa(unescape(encodeURIComponent(s)))}
 function b64d(s){return decodeURIComponent(escape(atob(s)))}
+// 合并本地与云端：取并集，缺的补全，绝不互相清空
+function mergeUD(L,C){
+ L=L||{};C=C||{};const out={};
+ // 训练记录：按日期去重，同日取动作更多的
+ const byDate={};const put=s=>{if(!s||!s.date)return;const k=s.date;const cur=byDate[k];if(!cur||((s.ex||[]).length>(cur.ex||[]).length))byDate[k]=s;};
+ (L.qx_sessions||[]).forEach(put);(C.qx_sessions||[]).forEach(put);
+ out.qx_sessions=Object.values(byDate);
+ // 自定义动作：按名称去重
+ const exMap={};(L.qx_customEx||[]).concat(C.qx_customEx||[]).forEach(e=>{if(e&&e.n)exMap[e.n]=e;});
+ out.qx_customEx=Object.values(exMap);
+ // 动作计数：数值相加
+ const ec={};const add=o=>{Object.entries(o||{}).forEach(([k,v])=>{if(typeof v==='number')ec[k]=(ec[k]||0)+v;});};add(L.qx_exCount);add(C.qx_exCount);out.qx_exCount=ec;
+ // 点赞/收藏/热身：数组合并集
+ const uni=(a,b)=>Array.from(new Set([].concat(a||[],b||[])));
+ out.qx_liked=uni(L.qx_liked,C.qx_liked);out.qx_saved=uni(L.qx_saved,C.qx_saved);out.qx_warmupCustom=uni(L.qx_warmupCustom,C.qx_warmupCustom);
+ // 训练计划：按 key 合并（云端优先，缺失补本地）
+ const plans={};Object.keys(L).forEach(k=>{if(k.indexOf('qx_plan_')===0)plans[k]=L[k];});Object.keys(C).forEach(k=>{if(k.indexOf('qx_plan_')===0)plans[k]=C[k];});
+ Object.assign(out,plans);
+ out.savedAt=Math.max(Number(L.savedAt||0),Number(C.savedAt||0),Date.now());
+ return out;
+}
 async function syncToCloud(){
  const tok=getTok();if(!tok)return;const st=$('#sync-status');
  try{
-  const data=collectUserdata();const content=b64e(JSON.stringify(data));let sha=null;
+  const local=collectUserdata();let cloud=null,sha=null;
   const r=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
-  if(r.status===200){const j=await r.json();sha=j.sha}
+  if(r.status===200){const j=await r.json();sha=j.sha;try{cloud=JSON.parse(b64d(j.content))}catch{}}
+  const merged=mergeUD(local,cloud);
+  const content=b64e(JSON.stringify(merged));
   const body={message:'sync userdata '+new Date().toISOString(),content};if(sha)body.sha=sha;
   const up=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
-  if(st){if(up.status===200||up.status===201)st.textContent='☁️ 已同步 '+new Date().toLocaleString();else st.textContent='同步失败('+up.status+')，检查 token 权限'}
+  if(st){if(up.status===200||up.status===201)st.textContent='☁️ 已合并同步 '+new Date().toLocaleString();else st.textContent='同步失败('+up.status+')，检查 token 权限'}
  }catch(e){if(st)st.textContent='同步出错：'+e.message}
  updateSyncBadge();
 }
@@ -1300,9 +1324,17 @@ async function syncFromCloud(){
  const tok=getTok();if(!tok)return;const st=$('#sync-status');
  try{
   const r=await fetch('https://api.github.com/repos/'+DATA_REPO+'/contents/userdata.json',{headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json'}});
-  if(r.status!==200)return;const j=await r.json();const data=JSON.parse(b64d(j.content));
-  if(!data.savedAt)return;const localSaved=Number(ls('qx_sync_saved','0'));
-  if(data.savedAt>=localSaved){Object.keys(data).forEach(k=>{if(k==='savedAt')return;lsSet(k,data[k])});lsSet('qx_sync_saved',String(data.savedAt));sessions=ls('qx_sessions',[]);renderHistory();updateHome();updateTrainStreak();if(st)st.textContent='☁️ 已从云端恢复 '+new Date(data.savedAt).toLocaleString();}
+  if(r.status!==200)return;const j=await r.json();let cloud;try{cloud=JSON.parse(b64d(j.content))}catch{return}
+  if(!cloud||!cloud.savedAt)return;
+  const local=collectUserdata();const merged=mergeUD(local,cloud);
+  const localN=(local.qx_sessions||[]).length, mergeN=(merged.qx_sessions||[]).length;
+  // 仅当合并结果不比本地少时才写回，绝不清空本地
+  if(mergeN>=localN){
+   Object.keys(merged).forEach(k=>{if(k==='savedAt')return;lsSet(k,merged[k])});
+   lsSet('qx_sync_saved',String(merged.savedAt));
+   sessions=ls('qx_sessions',[]);renderHistory();updateHome();updateTrainStreak();
+   if(st)st.textContent='☁️ 已合并恢复 '+new Date(cloud.savedAt).toLocaleString();
+  }
  }catch(e){}
  updateSyncBadge();
 }
